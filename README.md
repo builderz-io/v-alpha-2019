@@ -107,4 +107,4 @@ This project is licensed under the Apache 2.0 license - see the [LICENSE.md](LIC
 
 ## Acknowledgements
 
-We are grateful to the many developers building the tools and applications, that make it possible to publish this Alpha Version.
+We are grateful to the many developers building the tools and applications that make it possible to publish this Alpha Version.
