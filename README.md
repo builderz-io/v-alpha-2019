@@ -78,6 +78,11 @@ Setup test-users across several browsers to send Value between these users.
 
 Use Ubuntu, Nginx, PM2 or the like to run this on a public server.
 
+Set false to true in vi-alpha.js:
+
+```
+var production = true;
+```
 
 ## Built With
 
