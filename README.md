@@ -1,8 +1,6 @@
 # Value Instrument Alpha
 
-This repository includes an implementation of the Value Instrument's four principles in monetary design, that aim to stimulate economic activity in communities.
-
-This alpha version is coded with blockchain technology in mind, yet it does not run on or connect to any blockchain in its current state.
+This repository includes an implementation of the Value Instrument's four principles in monetary design, that aim to stimulate economic activity in communities. This alpha version is coded with blockchain technology in mind, yet it does not run on or connect to any blockchain in its current state.
 
 Installing and running this alpha will give you an online-banking-web-app with a chat-like user interface.
 
@@ -87,7 +85,7 @@ Use Ubuntu, Nginx, PM2 or the like to run this on a public server.
 * express.js
 * socket.io
 * d3.js
-* monent.js
+* moment.js
 * MongoDB / mongoose.js
 
 
@@ -102,4 +100,4 @@ This project is licensed under the Apache 2.0 license - see the [LICENSE.md](LIC
 
 ## Acknowledgements
 
-* We are grateful to the many developers building the tools and applications, that make it possible to publish this Alpha Version.
+We are grateful to the many developers building the tools and applications, that make it possible to publish this Alpha Version.
