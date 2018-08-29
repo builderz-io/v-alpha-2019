@@ -1,8 +1,8 @@
 {
-  "name": "VI-Chat",
-  "version": "0.0.10",
-  "description": "Value Instrument Alpha using Pushy Layout by Chris Yee (https://chrisyee.ca/pushy/) and html5 Boilerplate (https://html5boilerplate.com/)",
-  "main": "app.js",
+  "name": "Value Instrument Alpha",
+  "version": "0.1.0",
+  "description": "Value Instrument Alpha",
+  "main": "vi-alpha.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

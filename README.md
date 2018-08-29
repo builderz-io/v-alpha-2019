@@ -92,11 +92,13 @@ var production = true;
 * d3.js
 * moment.js
 * MongoDB / mongoose.js
+* [Pushy Layout](https://chrisyee.ca/pushy/)
+* [html5 Boilerplate](https://html5boilerplate.com/)
 
 
 ## Authors
 
-* **Philipe Achille Villers** - *Initial alpha coding* - [philipeachille](https://github.com/philipeachille)
+* **Philipe Achille Villiers** - *Initial alpha coding* - [philipeachille](https://github.com/philipeachille)
 
 
 ## License
