@@ -10,7 +10,7 @@ var baseTimeToZero = 60 * 60 * 24 * 120,  // expressed in sec
 
 // set production
 
-var production = false;
+var production = true;
 
 // system init
 
@@ -41,6 +41,7 @@ http.listen(3021, 'localhost', function(){
   console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'Listening on port 3021');
 });
 
+
 // database init
 
 var msgSchema = mongoose.Schema({
@@ -50,6 +51,7 @@ var msgSchema = mongoose.Schema({
 });
 var userSchema = mongoose.Schema({
   name: String,
+  uPhrase: String,
   profile: {
     name: String,
     karma: Number,
@@ -121,6 +123,7 @@ ChatDB.estimatedDocumentCount().exec((err, res) => {
 
 
 io.on('connection', function(socket) {
+// all main functionality
 
   socket.on('chat message', function(message) {
 
@@ -414,17 +417,25 @@ io.on('connection', function(socket) {
                   })
   });
 
-  socket.on('returning user', function(user, callback) {
+  socket.on('returning user', function(userData, callback) {
 
-    UserDB.find().distinct('name')
-      .then((userList) => {
-        if (userList.indexOf(user) != -1) {
+    var user = userData[0],
+        uPhrase = userData[1];
+
+    UserDB.findOne({ name: user }, function (err, doc) {
+
+        if (err) { return console.log('Error on returning user ' + err); };
+        if (doc === null) {
+          return callback(1);
+        };
+
+        if (doc.uPhrase === uPhrase) {
+
           socket.user = user;
           sendMessageHistory(user, true );
           updateUserAccountData([user]);
           socket.emit('name in header', [ socket.user, commName ] );
 
-          UserDB.findOne({ name: user }, function (err, doc) {
             doc.profile.lastLogin = Date.now();
             doc.profile.socketID = String(socket.id);
             doc.save((err) => {
@@ -432,24 +443,31 @@ io.on('connection', function(socket) {
               updateUserOnlineList();
               updateUserAccountData([user]);
             });
-          });
-
-          return callback(true);
+          return callback(2);
 
         } else {
-          return callback(false);
+          return callback();
         }
-      })
-      .catch((err) => {
-        console.log('Issue with returning user - ' + err);
 
-      });
+    });
 
   });
 
-  socket.on('new user', function(user, callback) {
+  socket.on('new user', function(userData, callback) {
 
-    UserDB.find().distinct('name')
+    var user = userData[0],
+        uPhrase = userData[1],
+        entry = userData[2];
+
+    if (entry.charAt(0) === 'v' && entry.charAt(1) === 'v') {
+       UserDB.findOne({ uPhrase: entry }, function (err, doc) {
+          if (err) { return console.log('Error on returning user ' + err); };
+          doc === null ? callback(false) : socket.emit('set cookies', [ doc.name, doc.uPhrase ] );
+        });
+
+    } else {
+
+      UserDB.find().distinct('name')
         .then((userList) => {
 
             if (userList.indexOf(user) != -1 || user.length > 12 || user.length < 2) {
@@ -459,6 +477,7 @@ io.on('connection', function(socket) {
                 socket.user = user;
                 var newUser = new UserDB({
                   name: user,
+                  uPhrase: uPhrase,
                   profile: {
                     joined: date,
                     lastLogin: date,
@@ -529,14 +548,14 @@ io.on('connection', function(socket) {
           console.log('Issue with new user signup - ' + err);
 
         })
-
-
+    }
   });
 
   socket.on('disconnect', function() {
     if(!socket.user) return;
 
     UserDB.findOne({ name: socket.user }, function (err, doc) {
+      if (err || doc === null) { return console.log(err);}
       doc.profile.socketID = 'offline';
       doc.save((err) => {
         if (err) {return handleMongoDBerror('Set User to offline in DB', err) };

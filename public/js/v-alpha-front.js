@@ -13,24 +13,29 @@
    var windowHeight = $( window ).height();  // get device height to set pushy height
    $("#container").height(windowHeight);
 
-   navigator.cookieEnabled ? Cookies.get("name") ? returningUser() : newUser() : $('#register-error').html('You must have Cookies enabled in your browser for this web app to function.');
+   navigator.cookieEnabled ? Cookies.get("name") && Cookies.get("uPhrase") ? returningUser() : newUser() : $('#register-error').html('You must have Cookies enabled in your browser for this web app to function.');
 
    function returningUser() {
 
-      socket.emit('returning user', Cookies.get("name"), function(callback) {
-        if (callback) {
-              $('#new-user-form').hide();
-              $('#register-error').hide();
-              $('#container').show();
-              $('#chat-message-form').show();
-              $('#menu-button').show();
-              autoScroll();
-
-        } else {
+      socket.emit('returning user', [Cookies.get("name"), Cookies.get("uPhrase")], function(callback) {
+        if (callback === 1) {
           Cookies.remove('name');
+          Cookies.remove('uPhrase');
           $('#register-error').html('Please register again. The app has been updated since your last visit.');
           $('#new-user-form').show();
           $('#user-name').attr('placeholder','Enter your preferred name');
+
+        } else if (callback === 2) {
+                $('#new-user-form').hide();
+                $('#register-error').hide();
+                $('#container').show();
+                $('#chat-message-form').show();
+                $('#menu-button').show();
+                autoScroll();
+
+        } else {
+          $('#register-error').html('Your unique phrase (saved as a cookie on your device) does not match. Contact the community admin.');
+
         }
       });
    }
@@ -42,11 +47,14 @@
 
    $('#new-user-form').submit(function(){
 
-       var niceName = forceNiceLookingName($('#user-name').val());
+       var entry = $('#user-name').val(),
+           niceName = forceNiceLookingName($('#user-name').val()),
+           uPhrase = 'vv' + socket.id;
 
-       socket.emit('new user', niceName, function(callback) {
+       socket.emit('new user', [niceName, uPhrase, entry], function(callback) {
          if (callback) {
                Cookies.set("name", niceName, { expires: 365 * 4 });
+               Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
                $('#new-user-form').hide();
                $('#register-error').hide();
                $('#container').show();
@@ -110,6 +118,12 @@
      } else { return false };
    }
 
+   socket.on('set cookies', function(data) {
+     Cookies.set("name", data[0], { expires: 365 * 4 });
+     Cookies.set("uPhrase", data[1], { expires: 365 * 4 });
+     returningUser();
+   });
+
    socket.on('chat message', function(data){
 
      $('#messages-ul li:last-child').attr('class') === "notification-container" ?
@@ -163,14 +177,13 @@
      spendable: ,
      chainBalance: ,
      }
-     */
-     /*
+
      [{"_id":"5b79eb0abdf91c45bd172388",
-     "name":"As",
+     "name":"Peter",
      "txHistory":[
-       {"_id":"5b79eb0abdf91c45bd172389","date":"2018-08-19T22:11:22.852Z","from":"Value","to":"As","for":"Welcome Balance","senderFee":0,"burned":0,"tt0":200,"credit":100,"debit":0,"spendable":66,"chainBalance":100},
-       {"_id":"5b79eb0fbdf91c45bd17238c","date":"2018-08-19T22:11:27.533Z","from":"Value","to":"As","for":"Basic Income","senderFee":0,"burned":2,"tt0":195,"credit":10,"debit":0,"spendable":72,"chainBalance":108},
-       {"_id":"5b79eb19bdf91c45bd17238d","date":"2018-08-19T22:11:37.537Z","from":"Value","to":"As","for":"Basic Income","senderFee":0,"burned":5,"tt0":185,"credit":10,"debit":0,"spendable":75,"chainBalance":113}
+       {"_id":"5b79eb0abdf91c45bd172389","date":"2018-08-19T22:11:22.852Z","from":"Value","to":"Peter","for":"Welcome Balance","senderFee":0,"burned":0,"tt0":200,"credit":100,"debit":0,"spendable":66,"chainBalance":100},
+       {"_id":"5b79eb0fbdf91c45bd17238c","date":"2018-08-19T22:11:27.533Z","from":"Value","to":"Peter","for":"Basic Income","senderFee":0,"burned":2,"tt0":195,"credit":10,"debit":0,"spendable":72,"chainBalance":108},
+       {"_id":"5b79eb19bdf91c45bd17238d","date":"2018-08-19T22:11:37.537Z","from":"Value","to":"Peter","for":"Basic Income","senderFee":0,"burned":5,"tt0":185,"credit":10,"debit":0,"spendable":75,"chainBalance":113}
        ]
      }] */
 
@@ -305,11 +318,13 @@
    socket.on('nukeme', function() {
 
      Cookies.remove('name');
+     Cookies.remove('uPhrase');
      $('body').html('<div id="register-error">Account removed. Reload the page to start over.');
 
    });
 
-   function accountpie() {
+
+   function accountpie() {  // shout out to Abhisek via adeveloperdiary.com
 
      var total= dataset[2].spendable;
 
@@ -426,7 +441,7 @@
      $('#container').animate({scrollTop: $('#container').get(0).scrollHeight}, 500);
    }
 
-   function playSound() {
+   function playSound() { // this is a beautiful sound composition by philipeachille
 
       var sineWave1 = new Pizzicato.Sound({
           source: 'wave',
