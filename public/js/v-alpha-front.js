@@ -1,5 +1,7 @@
 (function () {
 
+// front-end functionality
+
    var socket = io();
 
    var dataset = [
@@ -256,7 +258,9 @@
    });
 
    socket.on('name in header', function(name) {
-     $('#user-in-header').html(name);
+     $('#user-in-header').html(name[0]);
+     $('#header-right').html(name[1]);
+     $('title').html(name[1] + ' - Value Alpha');
    });
 
    socket.on('transaction received', function() {
