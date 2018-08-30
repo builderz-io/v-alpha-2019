@@ -1,11 +1,12 @@
 // set UBI variables
 
-var baseTimeToZero = 60 * 60 * 24 * 120, // expressed in sec
-    ubiInterval = 60 * 60 * 6, // expressed in sec
-    initialBalance = 120, // amount V
+var baseTimeToZero = 60 * 60 * 24 * 120,  // expressed in sec
+    ubiInterval = 60 * 60 * 6,  // expressed in sec
+    initialBalance = 120,  // amount V
     ubi = 2,  // amount V
-    updateVisFreq = 60 * 5, // expressed in sec
-    setTxFee = 0.5 ;// express in decimal number such as 0.5 for 50%
+    updateVisFreq = 60 * 5,  // expressed in sec
+    setTxFee = 0.5,  // express in decimal number such as 0.5 for 50%
+    commName = 'Value Instrument';  // the community name as String
 
 // set production
 
@@ -110,7 +111,7 @@ UserDB.find().select('profile').exec((err, res) => {
 
 ChatDB.estimatedDocumentCount().exec((err, res) => {
     if (res < 1) {
-      var firstMsg = new ChatDB({msg: 'This is the start of the value community chat.<br/>And so it begins ...<br/><br/>', sender: 'Value Instrument', time: Date.now() });
+      var firstMsg = new ChatDB({msg: 'This is the start of the ' + commName + ' banking app.<br/>And so it begins ...<br/><br/>', sender: commName, time: Date.now() });
       firstMsg.save((err) => { if (err) return handleMongoDBerror('Write first chat message to DB', err) });
     }
 })
@@ -162,7 +163,7 @@ io.on('connection', function(socket) {
                       amount = filteredNumbers.reduce(function(acc, val) { return Number(acc) + Number(val); }, 0);
 
          return amount <= 0 ? errorTx('Invalid amount') :
-          recipients.length < 1 ? errorTx('No community member entered') :
+          recipients.length < 1 ? errorTx('No ' + commName + ' member entered') :
           recipients.indexOf(socket.user) != -1 ? errorTx('You can not send <span class="v">V</span> to yourself') :
          [amount, forceNiceLookingName(socket.user), recipients, reason, timeSecondsUNIX]
 
@@ -205,7 +206,7 @@ io.on('connection', function(socket) {
          }
 
          if (burnedSenderBalance <= 0) {
-           var error = txArray[0] > 9999 ? 'You wish... unfortunately you\'re still missing ' + (txArray[0] - burnedSenderBalance) + ' <span class="v">V</span> to make such large transaction. How about offering something great to the <span class="v">V </span> Community? We never say never!' : 'Not enough balance to send ' + txArray[0] + ' <span class="v">V</span>';
+           var error = txArray[0] > 9999 ? 'You wish... unfortunately you\'re still missing ' + (txArray[0] - burnedSenderBalance) + ' <span class="v">V</span> to make such large transaction. How about offering something great to the ' + commName + ' community? We never say never!' : 'Not enough balance to send ' + txArray[0] + ' <span class="v">V</span>';
 
            socket.emit('chat notification', { msg :'<span class="red-text">' + error + '</span>', symbol: '&#9673;' });
            throw new Error(error);
@@ -421,7 +422,7 @@ io.on('connection', function(socket) {
           socket.user = user;
           sendMessageHistory(user, true );
           updateUserAccountData([user]);
-          socket.emit('name in header', socket.user );
+          socket.emit('name in header', [ socket.user, commName ] );
 
           UserDB.findOne({ name: user }, function (err, doc) {
             doc.profile.lastLogin = Date.now();
@@ -475,7 +476,7 @@ io.on('connection', function(socket) {
                   name: user,
                   txHistory: {
                     date: date,
-                    from: 'Value',
+                    from: commName,
                     to: user,
                     for: 'Welcome Balance',
                     senderFee: 0,
@@ -491,7 +492,7 @@ io.on('connection', function(socket) {
                   name: user,
                   txHistory: {
                     date: date,
-                    from: 'Value',
+                    from: commName,
                     to: user,
                     for: 'Welcome Balance',
                     senderFee: 0,
@@ -515,7 +516,7 @@ io.on('connection', function(socket) {
 
                 sendMessageHistory(user , false );
 
-                socket.emit('name in header', socket.user );
+                socket.emit('name in header', [ socket.user, commName ] );
 
                 console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + user + ' registered and added to list');
 
@@ -597,7 +598,7 @@ io.on('connection', function(socket) {
                       } else { break }
                     };
 
-                    socket.emit('chat notification', { msg: 'Community members recently sent you ...<br/><br/>' + recentCredits, symbol: '&#9673;' });
+                    socket.emit('chat notification', { msg: commName + ' members recently sent you ...<br/><br/>' + recentCredits, symbol: '&#9673;' });
 
                     return;
 
@@ -733,7 +734,7 @@ function ubiEmit() {
         {name: user.name},
         { $push: { txHistory: {
           date: Date.now(),
-          from: 'Value',
+          from: commName,
           to: user.name,
           for: 'Basic Income',
           senderFee: 0,
