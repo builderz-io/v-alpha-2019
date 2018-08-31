@@ -113,7 +113,7 @@ UserDB.find().select('profile').exec((err, res) => {
 
 ChatDB.estimatedDocumentCount().exec((err, res) => {
     if (res < 1) {
-      var firstMsg = new ChatDB({msg: 'This is the start of the ' + commName + ' banking app.<br/>And so it begins ...<br/><br/>', sender: commName, time: Date.now() });
+      var firstMsg = new ChatDB({msg: 'This is the start of the ' + commName + ' banking app. And so it begins ...<br/><br/>', sender: commName, time: Date.now() });
       firstMsg.save((err) => { if (err) return handleMongoDBerror('Write first chat message to DB', err) });
     }
 })
@@ -429,7 +429,7 @@ io.on('connection', function(socket) {
         if (doc.uPhrase === uPhrase) {
 
           socket.user = doc.name;
-          sendMessageHistory(doc.name, true );
+          sendMessageHistory(doc.name, uPhrase, true );
           updateUserAccountData([doc.name]);
           socket.emit('name in header', [ doc.name, commName ] );
 
@@ -456,7 +456,7 @@ io.on('connection', function(socket) {
         uPhrase = userData[1],
         entry = userData[2];
 
-    if (entry.substring(0,2) === 'vv') {
+    if (entry.substring(0,2) === 'vx') {
        UserDB.findOne({ uPhrase: entry }, function (err, doc) {
           if (err) { return console.log('Error on returning user ' + err); };
           doc === null ? callback(false) : socket.emit('set cookies', doc.uPhrase );
@@ -530,7 +530,7 @@ io.on('connection', function(socket) {
                 newTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to DB', err) }),
                 newRecentTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to Recent DB', err) })
 
-                sendMessageHistory(user , false );
+                sendMessageHistory(user, uPhrase, false );
 
                 socket.emit('name in header', [ socket.user, commName ] );
 
@@ -574,26 +574,26 @@ io.on('connection', function(socket) {
   });
 
 
-  function sendMessageHistory(user, retUser) {
+  function sendMessageHistory(user, uPhrase, retUser) {
 
     ChatDB.find({}).sort('-time').limit(100).exec(function(err, docs) {
                   if (err) return handleMongoDBerror('Get Message History from DB', err);
                   socket.emit('chat history', docs.sort('time'), function(callback) {
-                    callback && retUser === true ? welcomeBack(user) : welcomeNew(user);
+                    callback && retUser === true ? welcomeBack(user, uPhrase) : welcomeNew(user, uPhrase);
                   });
-
                });
   }
 
-  function welcomeBack(user) {
-    socket.emit('chat notification', { msg: socket.user + ' - Welcome back to <span class="v">V</span><br/>Remember to enter "help" for help.', symbol: '&#9673;' });
+  function welcomeBack(user, uPhrase) {
+    socket.emit('chat notification', { msg: socket.user + ' - Welcome back!<br/><br/>Remember to enter "help" for help.', symbol: '&#9673;' });
     var recentCredits = constructRecentCredits(user);
   }
 
-  function welcomeNew(user) {
-    socket.emit('chat notification', { msg: user + ' - Welcome to <span class="v">V</span>', symbol: '&#9673;' });
+  function welcomeNew(user, uPhrase) {
+//    socket.emit('chat notification', { msg: user + ' - Welcome!', symbol: '&#9673;' });
+    socket.emit('chat notification', { msg: user + ' - Welcome!<br/><br/>Note down or copy your unique phrase somewhere safe:<br/><br/><span class="red-text">' + uPhrase + '</span><br/><br/>Use this phrase to recover your account and log in on other devices.', symbol: '&#9673;' });
     socket.emit('chat notification', { msg: 'Enter "help" at any time to learn about transferring Value to others.', symbol: '&#9673;' });
-    socket.emit('chat notification', { msg: 'Note that you are experimenting with an alpha test version. Your messages and transactions may be deleted without warning.', symbol: '&#9673;' });
+//    socket.emit('chat notification', { msg: 'Note that you are experimenting with an alpha test version. Your messages and transactions may be deleted without warning.', symbol: '&#9673;' });
     socket.emit('chat notification', { msg: 'We recommend using Firefox as browser.', symbol: '&#9673;' });
 
   }

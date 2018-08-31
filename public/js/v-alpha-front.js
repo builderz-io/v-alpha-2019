@@ -48,7 +48,7 @@
 
        var entry = $('#user-name').val(),
            niceName = forceNiceLookingName($('#user-name').val()),
-           uPhrase = 'vv' + socket.id;
+           uPhrase = 'vx' + socket.id;
 
        socket.emit('new user', [niceName, uPhrase, entry], function(callback) {
          if (callback) {
