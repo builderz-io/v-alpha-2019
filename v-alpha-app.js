@@ -10,7 +10,7 @@ var baseTimeToZero = 60 * 60 * 24 * 120,  // expressed in sec
 
 // set production
 
-var production = true;
+var production = false;
 
 // system init
 
@@ -417,12 +417,9 @@ io.on('connection', function(socket) {
                   })
   });
 
-  socket.on('returning user', function(userData, callback) {
+  socket.on('returning user', function(uPhrase, callback) {
 
-    var user = userData[0],
-        uPhrase = userData[1];
-
-    UserDB.findOne({ name: user }, function (err, doc) {
+    UserDB.findOne({ uPhrase: uPhrase }, function (err, doc) {
 
         if (err) { return console.log('Error on returning user ' + err); };
         if (doc === null) {
@@ -431,17 +428,17 @@ io.on('connection', function(socket) {
 
         if (doc.uPhrase === uPhrase) {
 
-          socket.user = user;
-          sendMessageHistory(user, true );
-          updateUserAccountData([user]);
-          socket.emit('name in header', [ socket.user, commName ] );
+          socket.user = doc.name;
+          sendMessageHistory(doc.name, true );
+          updateUserAccountData([doc.name]);
+          socket.emit('name in header', [ doc.name, commName ] );
 
             doc.profile.lastLogin = Date.now();
             doc.profile.socketID = String(socket.id);
             doc.save((err) => {
               if (err) {return handleMongoDBerror('Save Returning User to DB', err) };
               updateUserOnlineList();
-              updateUserAccountData([user]);
+              updateUserAccountData([doc.name]);
             });
           return callback(2);
 
@@ -459,10 +456,10 @@ io.on('connection', function(socket) {
         uPhrase = userData[1],
         entry = userData[2];
 
-    if (entry.charAt(0) === 'v' && entry.charAt(1) === 'v') {
+    if (entry.substring(0,2) === 'vv') {
        UserDB.findOne({ uPhrase: entry }, function (err, doc) {
           if (err) { return console.log('Error on returning user ' + err); };
-          doc === null ? callback(false) : socket.emit('set cookies', [ doc.name, doc.uPhrase ] );
+          doc === null ? callback(false) : socket.emit('set cookies', doc.uPhrase );
         });
 
     } else {

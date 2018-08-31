@@ -13,13 +13,12 @@
    var windowHeight = $( window ).height();  // get device height to set pushy height
    $("#container").height(windowHeight);
 
-   navigator.cookieEnabled ? Cookies.get("name") && Cookies.get("uPhrase") ? returningUser() : newUser() : $('#register-error').html('You must have Cookies enabled in your browser for this web app to function.');
+   navigator.cookieEnabled ? Cookies.get("uPhrase") ? returningUser() : newUser() : $('#register-error').html('You must have Cookies enabled in your browser for this web app to function.');
 
    function returningUser() {
 
-      socket.emit('returning user', [Cookies.get("name"), Cookies.get("uPhrase")], function(callback) {
+      socket.emit('returning user', Cookies.get("uPhrase"), function(callback) {
         if (callback === 1) {
-          Cookies.remove('name');
           Cookies.remove('uPhrase');
           $('#register-error').html('Please register again. The app has been updated since your last visit.');
           $('#new-user-form').show();
@@ -53,7 +52,6 @@
 
        socket.emit('new user', [niceName, uPhrase, entry], function(callback) {
          if (callback) {
-               Cookies.set("name", niceName, { expires: 365 * 4 });
                Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
                $('#new-user-form').hide();
                $('#register-error').hide();
@@ -118,9 +116,8 @@
      } else { return false };
    }
 
-   socket.on('set cookies', function(data) {
-     Cookies.set("name", data[0], { expires: 365 * 4 });
-     Cookies.set("uPhrase", data[1], { expires: 365 * 4 });
+   socket.on('set cookies', function(uPhrase) {
+     Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
      returningUser();
    });
 
@@ -317,7 +314,6 @@
 
    socket.on('nukeme', function() {
 
-     Cookies.remove('name');
      Cookies.remove('uPhrase');
      $('body').html('<div id="register-error">Account removed. Reload the page to start over.');
 
