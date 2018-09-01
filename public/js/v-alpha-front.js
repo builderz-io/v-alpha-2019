@@ -1,3 +1,5 @@
+// Value Instrument Alpha | Version 0.2.0 | Apache 2.0 License | https://github.com/valueinstrument/vi-alpha
+
 (function () {
 
 // front-end functionality
@@ -193,7 +195,7 @@
      $('#spendable-in-header').html(data.spendable + ' <span class="v">V</span>');
 
      dataset[0].count = data.rt0;
-     dataset[1].count = 140 - data.rt0;
+     dataset[1].count = data.dt0 - data.rt0;
      dataset[2].spendable = data.spendable;
 
      $('#chart').empty();
