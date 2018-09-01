@@ -1,4 +1,4 @@
-#container, #chat-message-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification {
+#container, #chat-message-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification, #page {
    display: none;
 }
 
@@ -29,10 +29,17 @@ list-style-type: none;
 }
 
 .message-container {
-  margin: 10px 0;
+  margin-bottom: 10px;
+  margin-top: 5px;
 }
 
+.message-sender {
+  margin-bottom: 5px;
+}
 
+.message-p {
+  margin-bottom: 8px;
+}
 
 
 #bottom-row {
@@ -152,7 +159,7 @@ input:focus, button:focus {
   font-size: 0.8em;
   background: paleturquoise;
   padding: 7px;
-  margin-top: 5px;
+  margin-bottom: 6px;
 }
 
 #disconnected-notification {
@@ -211,6 +218,14 @@ input:focus, button:focus {
 position: relative;
 }
 
+.fa-times-circle {
+  color: whitesmoke;
+font-size: 1.8em;
+margin: 4px 0;
+text-align: center;
+width: 100%;
+}
+
 .online-user {
   color: #41B787;
 }
@@ -243,7 +258,7 @@ margin-bottom: 1px;
 }
 
 
-#tx-history-section, #location-section, #profile-section {
+#page {
   position: fixed;
   width: 100%;
   height: 100%;
@@ -253,9 +268,10 @@ margin-bottom: 1px;
   bottom: 0;
   background: rgba(250, 250, 250, .7);
   padding: 42px 20px;
+  z-index: 2000;
 }
 
-.location-section {
+.page-content {
   width: 100%;
   height: 100%;
   background: rgba(250, 250, 250, 1);
@@ -264,22 +280,11 @@ margin-bottom: 1px;
   font-size: 0.72em;
 }
 
-.profile-section {
-  width: 100%;
-  height: 100%;
-  background: rgba(250, 250, 250, 1);
-  padding: 5px;
-  overflow-y: scroll;
-  font-size: 0.72em;
-}
-
-.tx-history-table {
-  width: 100%;
-  height: 100%;
-  background: rgba(250, 250, 250, 1);
-  padding: 5px;
-  overflow-y: scroll;
-  font-size: 0.72em;
+.page-title {
+    font-size: 1.8em;
+    margin: 22px 0;
+    text-align: center;
+    width: 100%;
 }
 
 .tx-type {

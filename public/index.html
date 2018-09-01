@@ -19,7 +19,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
 	<!-- Important stuff for SEO, don't neglect. (And don't dupicate values across your site!) -->
-	<title>Value Alpha</title>
+	<title>Value Banking Alpha</title>
 	<meta name="author" content="Value Instrument" />
 	<meta name="description" content="See the Value Instrument Principles in action in this functional Alpha Version" />
 
@@ -72,7 +72,7 @@
 
 <body>
 
-	<header id="site-header" class="site-header push"><div id="name-in-header"><span id="user-in-header"><span class="v">V</span> Alpha</span> <span>&nbsp;</span> <span id="spendable-in-header" class="straight-number"></span></div> <div id="header-right">Welcome</div></header>
+	<header id="site-header" class="site-header push"><div id="name-in-header"><span id="user-in-header"><span class="v">V</span> Banking Alpha</span> <span>&nbsp;</span> <span id="spendable-in-header" class="straight-number"></span></div> <div id="header-right"></div></header>
 
 	<!-- Pushy Menu Left-->
 	<nav class="pushy pushy-left nav-height" data-focus="#first-link">
@@ -102,10 +102,11 @@
 								<button id="account-profile">Community</button>
 								<ul id="profile-list">
 									  <li class="pushy-link"><button id="location-btn" class="btn-in-menu">Locations</button></li>
-										<li class="pushy-link"><button id="recent-btn" class="btn-in-menu">Events</button></li>
-										<li class="pushy-link"><button id="recent-btn" class="btn-in-menu">Jobs</button></li>
-										<li class="pushy-link"><button id="popular-btn" class="btn-in-menu">Product & Service Offers</button></li>
-										<li class="pushy-link"><button id="all-btn" class="btn-in-menu">Share Knowledge</button></li>
+										<!-- li class="pushy-link"><button id="event-btn" class="btn-in-menu">Events</button></li>
+										<li class="pushy-link"><button id="job-btn" class="btn-in-menu">Jobs</button></li>
+										<li class="pushy-link"><button id="wao-btn" class="btn-in-menu">Wanted & Offered</button></li>
+										<li class="pushy-link"><button id="knowledge-btn" class="btn-in-menu">Share Knowledge</button></li -->
+										<li class="pushy-link"><button id="about-btn" class="btn-in-menu">About</button></li>
 								</ul>
 				    	</li>
 							<li class="pushy-submenu">
@@ -126,23 +127,16 @@
 	<div class="site-overlay"></div>
 	<div class="site-overlay-2"></div>
 
-	<div id="tx-history-section">
-		<div class="tx-history-table">
+	<div id="page">
+		<div class="page-content">
+			<div class="page-title"></div>
+			<div class="page-pipe"></div>
 		</div>
-	</div>
-
-	<div id="location-section">
-		<div class="location-section">
-		</div>
-	</div>
-
-	<div id="profile-section">
-		<div class="profile-section">
-		</div>
+		<i class="far fa-times-circle"></i>
 	</div>
 
 	<div id="disconnected-notification"><span class="red-text">Disconnected... you are. Try reloading.</span></div>
-	<div id="register-error"></div>
+	<div id="register-error">Enter your name below and join</div>
 
 	<div id="container">
 	  	<ul id="messages-ul" class="wordwrap"></ul>
@@ -156,7 +150,7 @@
     </form>
 
 	  <form id="new-user-form" class="register-form" action="">
-		  <input id="user-name" autocomplete="off" placeholder="Enter your preferred name" autofocus/><button class="button join-btn">Join <span class="v">V </span></button>
+		  <input id="user-name" autocomplete="off" placeholder="Enter your preferred name" autofocus/><button class="button join-btn">Join</button>
 	  </form>
   </div>
 
