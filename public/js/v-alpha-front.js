@@ -13,24 +13,28 @@
    var windowHeight = $( window ).height();  // get device height to set pushy height
    $("#container").height(windowHeight);
 
-   navigator.cookieEnabled ? Cookies.get("name") ? returningUser() : newUser() : $('#register-error').html('You must have Cookies enabled in your browser for this web app to function.');
+   navigator.cookieEnabled ? Cookies.get("uPhrase") ? returningUser() : newUser() : $('#register-error').html('You must have Cookies enabled in your browser for this web app to function.');
 
    function returningUser() {
 
-      socket.emit('returning user', Cookies.get("name"), function(callback) {
-        if (callback) {
-              $('#new-user-form').hide();
-              $('#register-error').hide();
-              $('#container').show();
-              $('#chat-message-form').show();
-              $('#menu-button').show();
-              autoScroll();
-
-        } else {
-          Cookies.remove('name');
+      socket.emit('returning user', Cookies.get("uPhrase"), function(callback) {
+        if (callback === 1) {
+          Cookies.remove('uPhrase');
           $('#register-error').html('Please register again. The app has been updated since your last visit.');
           $('#new-user-form').show();
           $('#user-name').attr('placeholder','Enter your preferred name');
+
+        } else if (callback === 2) {
+                $('#new-user-form').hide();
+                $('#register-error').hide();
+                $('#container').show();
+                $('#chat-message-form').show();
+                $('#menu-button').show();
+                autoScroll();
+
+        } else {
+          $('#register-error').html('Your unique phrase (saved as a cookie on your device) does not match. Contact the community admin.');
+
         }
       });
    }
@@ -42,11 +46,13 @@
 
    $('#new-user-form').submit(function(){
 
-       var niceName = forceNiceLookingName($('#user-name').val());
+       var entry = $('#user-name').val(),
+           niceName = forceNiceLookingName($('#user-name').val()),
+           uPhrase = 'vx' + socket.id;
 
-       socket.emit('new user', niceName, function(callback) {
+       socket.emit('new user', [niceName, uPhrase, entry], function(callback) {
          if (callback) {
-               Cookies.set("name", niceName, { expires: 365 * 4 });
+               Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
                $('#new-user-form').hide();
                $('#register-error').hide();
                $('#container').show();
@@ -97,18 +103,23 @@
    });
 
    function checkForTriggers(message) {
-     var triggers = ['+', 'pay', 'send', 'plus', 'sned', 'help', 'nukeme'];
+     var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme'];
 
      var messageParts = message.trim().toLowerCase().split(' ');
 
      if (messageParts[0].charAt(0) === '+') { messageParts.splice(1,0,messageParts[0].slice(1)); messageParts.splice(0,1,messageParts[0].charAt(0)); };
      if (messageParts[0].substring(0,3) === 'pay') { messageParts.splice(0,0,messageParts[0].substring(0,3)); messageParts.splice(1,1,messageParts[1].substring(3,messageParts[1].length)); };
-     if (messageParts[0].substring(0,4) === 'send' || messageParts[0].substring(0,4) === 'plus' || messageParts[0].substring(0,4) === 'sned' ) { messageParts.splice(0,0,messageParts[0].substring(0,4)); messageParts.splice(1,1,messageParts[1].substring(4,messageParts[1].length)); };
+     if (messageParts[0].substring(0,4) === 'send' || messageParts[0].substring(0,4) === 'plus' || messageParts[0].substring(0,4) === 'sned' || messageParts[0].substring(0,4) === 'sent' ) { messageParts.splice(0,0,messageParts[0].substring(0,4)); messageParts.splice(1,1,messageParts[1].substring(4,messageParts[1].length)); };
 
      if (triggers.indexOf(messageParts[0]) != -1) {
          return messageParts;
      } else { return false };
    }
+
+   socket.on('set cookies', function(uPhrase) {
+     Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
+     returningUser();
+   });
 
    socket.on('chat message', function(data){
 
@@ -145,108 +156,6 @@
 
     autoScroll();
 
-
-   });
-
-   socket.on('tx history', function(data){
-
-     /*  data = {
-     date: ,
-     from: ,
-     to: ,
-     for: ,
-     senderFee: ,
-     burned: ,
-     tt0: ,
-     credit: ,
-     debit: ,
-     spendable: ,
-     chainBalance: ,
-     }
-     */
-     /*
-     [{"_id":"5b79eb0abdf91c45bd172388",
-     "name":"As",
-     "txHistory":[
-       {"_id":"5b79eb0abdf91c45bd172389","date":"2018-08-19T22:11:22.852Z","from":"Value","to":"As","for":"Welcome Balance","senderFee":0,"burned":0,"tt0":200,"credit":100,"debit":0,"spendable":66,"chainBalance":100},
-       {"_id":"5b79eb0fbdf91c45bd17238c","date":"2018-08-19T22:11:27.533Z","from":"Value","to":"As","for":"Basic Income","senderFee":0,"burned":2,"tt0":195,"credit":10,"debit":0,"spendable":72,"chainBalance":108},
-       {"_id":"5b79eb19bdf91c45bd17238d","date":"2018-08-19T22:11:37.537Z","from":"Value","to":"As","for":"Basic Income","senderFee":0,"burned":5,"tt0":185,"credit":10,"debit":0,"spendable":75,"chainBalance":113}
-       ]
-     }] */
-
-      var table = document.createElement('TABLE'),
-          tableBody = document.createElement('TBODY'),
-          tableHead = document.createElement('THEAD');
-          table.appendChild(tableHead);
-          table.appendChild(tableBody);
-
-      var thCells = ['&nbsp;', 'Date', '&nbsp;', 'Time', 'Who', 'Reference', '<span class="v">V</span>', 'Chain', 'Fee', 'Burn', 'Days'];
-      var thCellClasses = ['tx-type', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit align-right', 'tx-balance align-right', 'tx-fee align-right', 'tx-burned align-right hide-cell', 'tx-tt0 align-right hide-cell'];
-      var thRow = tableHead.insertRow(0);
-
-      for (var i=0; i<thCells.length; i++) {
-        th = document.createElement('th');
-        th.innerHTML = thCells[i];
-        th.className = thCellClasses[i];
-        thRow.appendChild(th);
-      }
-
-      for (var j=data[0].txHistory.length; j-- > 0;) {
-
-        if (j >= 0 ) {
-
-          var tx = data[0].txHistory[j];
-
-          if (tx.senderFee === 0) {
-
-            var cells = ['&#9673;',
-                         moment(tx.date).format('D MMM'),
-                         moment(tx.date).format('YY'),
-                         moment(tx.date).format('hh:mm a'),
-                         tx.from,
-                         tx.for.charAt(0).toUpperCase() + tx.for.slice(1),
-                         tx.credit + ' <span class="v">V</span>',
-                         tx.chainBalance + ' <span class="v">V</span>',
-                         '',
-                         tx.burned,
-                         Math.floor(tx.tt0/60/60/24),
-
-                        ];
-
-            var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-balance straight-number align-right', 'tx-fee  straight-number align-right', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
-
-          } else {
-
-            var cells = ['&#9673;',
-                         moment(tx.date).format('D MMM'),
-                         moment(tx.date).format('YY'),
-                         moment(tx.date).format('hh:mm a'),
-                         tx.to,
-                         tx.for.charAt(0).toUpperCase() + tx.for.slice(1),
-                         (tx.debit * -1) + ' <span class="v">V</span>',
-                         tx.chainBalance + ' <span class="v">V</span>',
-                         tx.senderFee,
-                         tx.burned,
-                         Math.floor(tx.tt0/60/60/24),
-                       ];
-
-            var cellClasses = ['tx-type red-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number red-text align-right', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right', 'tx-burned straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
-
-          }
-
-          var tr = tableBody.insertRow(tableBody.rows.length);
-
-          for (var i=0; i<cells.length; i++) {
-              var td = tr.insertCell(i);
-              td.className = cellClasses[i];
-              td.innerHTML = cells[i];
-          };
-        }
-      };
-
-
-
-    $('.tx-history-table').html(table);
 
    });
 
@@ -304,12 +213,13 @@
 
    socket.on('nukeme', function() {
 
-     Cookies.remove('name');
+     Cookies.remove('uPhrase');
      $('body').html('<div id="register-error">Account removed. Reload the page to start over.');
 
    });
 
-   function accountpie() {
+
+   function accountpie() {  // shout out to Abhisek via adeveloperdiary.com
 
      var total= dataset[2].spendable;
 
@@ -426,7 +336,7 @@
      $('#container').animate({scrollTop: $('#container').get(0).scrollHeight}, 500);
    }
 
-   function playSound() {
+   function playSound() { // this is a beautiful sound composition by philipeachille
 
       var sineWave1 = new Pizzicato.Sound({
           source: 'wave',
@@ -468,43 +378,140 @@
 
     }
 
-// open and close 'pages'by setting z-index
+// Pages
 
    $('#tx-history-btn').click(function(){
-
-     $('#tx-history-section').attr('style', 'z-index: 2000;');
-
+     openPage();
      socket.emit('tx history');
-
     });
 
-   $('#location-btn').click(function(){
+   socket.on('tx history', function(data){
 
-     $('#location-section').attr('style', 'z-index: 2000;');
+      /*  data = {
+      date: ,
+      from: ,
+      to: ,
+      for: ,
+      senderFee: ,
+      burned: ,
+      tt0: ,
+      credit: ,
+      debit: ,
+      spendable: ,
+      chainBalance: ,
+      }
 
-     // socket.emit('location');
+      [{"_id":"5b79eb0abdf91c45bd172388",
+      "name":"Peter",
+      "txHistory":[
+        {"_id":"5b79eb0abdf91c45bd172389","date":"2018-08-19T22:11:22.852Z","from":"Value","to":"Peter","for":"Welcome Balance","senderFee":0,"burned":0,"tt0":200,"credit":100,"debit":0,"spendable":66,"chainBalance":100},
+        {"_id":"5b79eb0fbdf91c45bd17238c","date":"2018-08-19T22:11:27.533Z","from":"Value","to":"Peter","for":"Basic Income","senderFee":0,"burned":2,"tt0":195,"credit":10,"debit":0,"spendable":72,"chainBalance":108},
+        {"_id":"5b79eb19bdf91c45bd17238d","date":"2018-08-19T22:11:37.537Z","from":"Value","to":"Peter","for":"Basic Income","senderFee":0,"burned":5,"tt0":185,"credit":10,"debit":0,"spendable":75,"chainBalance":113}
+        ]
+      }] */
+
+       var table = document.createElement('TABLE'),
+           tableBody = document.createElement('TBODY'),
+           tableHead = document.createElement('THEAD');
+           table.appendChild(tableHead);
+           table.appendChild(tableBody);
+
+       var thCells = ['&nbsp;', 'Date', '&nbsp;', 'Time', 'Who', 'Reference', '<span class="v">V</span>', '&nbsp;', 'Chain', 'Fee', 'Burn', 'Days'];
+       var thCellClasses = ['tx-type', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit align-right', 'tx-v-sign', 'tx-balance align-right', 'tx-fee align-right', 'tx-burned align-right hide-cell', 'tx-tt0 align-right hide-cell'];
+       var thRow = tableHead.insertRow(0);
+
+       for (var i=0; i<thCells.length; i++) {
+         th = document.createElement('th');
+         th.innerHTML = thCells[i];
+         th.className = thCellClasses[i];
+         thRow.appendChild(th);
+       }
+
+       for (var j=data.txHistory.length; j-- > 0;) {
+
+         if (j >= 0 ) {
+
+           var tx = data.txHistory[j];
+
+           if (tx.senderFee === 0) {
+
+             var cells = ['&#9673;',
+                          moment(tx.date).format('D MMM'),
+                          moment(tx.date).format('YY'),
+                          moment(tx.date).format('hh:mm a'),
+                          tx.from,
+                          tx.for.charAt(0).toUpperCase() + tx.for.slice(1),
+                          tx.credit,
+                          '<span class="v">V</span>',
+                          tx.chainBalance,
+                          '',
+                          tx.burned,
+                          Math.floor(tx.tt0/60/60/24),
+
+                         ];
+
+             var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-v-sign green-text', 'tx-balance straight-number align-right', 'tx-fee  straight-number align-right', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
+
+           } else {
+
+             var cells = ['&#9673;',
+                          moment(tx.date).format('D MMM'),
+                          moment(tx.date).format('YY'),
+                          moment(tx.date).format('hh:mm a'),
+                          tx.to,
+                          tx.for.charAt(0).toUpperCase() + tx.for.slice(1),
+                          (tx.debit * -1),
+                          '<span class="v">V</span>',
+                          tx.chainBalance,
+                          tx.senderFee,
+                          tx.burned,
+                          Math.floor(tx.tt0/60/60/24),
+                        ];
+
+             var cellClasses = ['tx-type red-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number red-text align-right', 'tx-v-sign red-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right', 'tx-burned straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
+
+           }
+
+           var tr = tableBody.insertRow(tableBody.rows.length);
+
+           for (var i=0; i<cells.length; i++) {
+               var td = tr.insertCell(i);
+               td.className = cellClasses[i];
+               td.innerHTML = cells[i];
+           };
+         }
+       };
+
+     $('.page-title').html('Transaction History');
+     $('.page-pipe').html(table);
 
     });
 
    $('#profile-btn').click(function(){
-
-     $('#profile-section').attr('style', 'z-index: 2000;');
-
-     // socket.emit('location');
-
+     openPage();
+     socket.emit('profile');
    });
 
-   $('#tx-history-section').click(function(){
-	   $('#tx-history-section').attr('style', 'z-index: 100;');
+   socket.on('profile', function(data){
+     $('.page-title').html('Your Account Profile');
+     console.log(data);
+     $('.page-pipe').html('You are logged in as ' + data.name + '. <br/><br/>Your karma in community participation is ' + data.profile.karma + ' of 10.<br/><br/>Your unique phrase is ' + data.uPhrase + '<br/><br/>Note this phrase down. It can recover your account and log you in on other devices.');
+   });
+
+   // close page
+   $('.fa-times-circle').click(function(){
+	   $('#page').hide();
+     $('#chat-message-form').show();
+     $('#menu-button').show();
 	 });
 
-   $('#location-section').click(function(){
-	   $('#location-section').attr('style', 'z-index: 100;');
-	 });
+   // open page
+   function openPage() {
+     $('#chat-message-form').hide();
+     $('#menu-button').hide();
+     $('#page').show();
+   }
 
-   $('#profile-section').click(function(){
-	   $('#profile-section').attr('style', 'z-index: 100;');
-	 });
 
 // disallow back button
    $(document).ready(function() {

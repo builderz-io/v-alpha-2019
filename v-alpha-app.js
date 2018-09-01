@@ -41,6 +41,7 @@ http.listen(3021, 'localhost', function(){
   console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'Listening on port 3021');
 });
 
+
 // database init
 
 var msgSchema = mongoose.Schema({
@@ -50,6 +51,7 @@ var msgSchema = mongoose.Schema({
 });
 var userSchema = mongoose.Schema({
   name: String,
+  uPhrase: String,
   profile: {
     name: String,
     karma: Number,
@@ -111,7 +113,7 @@ UserDB.find().select('profile').exec((err, res) => {
 
 ChatDB.estimatedDocumentCount().exec((err, res) => {
     if (res < 1) {
-      var firstMsg = new ChatDB({msg: 'This is the start of the ' + commName + ' banking app.<br/>And so it begins ...<br/><br/>', sender: commName, time: Date.now() });
+      var firstMsg = new ChatDB({msg: 'Hello World! This is ' + commName + ' Value Banking ... imagine radio tuning noises here ...<br/><br/>', sender: commName, time: Date.now() });
       firstMsg.save((err) => { if (err) return handleMongoDBerror('Write first chat message to DB', err) });
     }
 })
@@ -121,6 +123,7 @@ ChatDB.estimatedDocumentCount().exec((err, res) => {
 
 
 io.on('connection', function(socket) {
+// all main functionality
 
   socket.on('chat message', function(message) {
 
@@ -154,7 +157,7 @@ io.on('connection', function(socket) {
            if (registeredUsers.indexOf(forceNiceLookingName(messageParts[i])) != -1) {
               recipients.push(forceNiceLookingName(messageParts[i]));
            } else {
-             var triggers = ['+', 'pay', 'send', 'plus', 'sned', 'help', 'nukeme'];
+             var triggers = ['+', 'pay', 'send', 'plus', 'sent', 'sned', 'help', 'nukeme'];
              (messageParts[i] === String && triggers.indexOf(messageParts[i]) === -1) ? errorTx('Can not send amount to ' + messageParts[i] + '. ' + messageParts[i] + 'may not be a registered member or you made a typing error.') : false;
            };
          };
@@ -272,7 +275,7 @@ io.on('connection', function(socket) {
                tt0: remainingTimeToZeroSender,
                credit: 0,
                debit: txArray[0],
-               spendable: Math.floor(chainBalance / (1 + setTxFee) ),
+               spendable: Math.floor(chainBalance / (1 + setTxFee) ) - 1,
                chainBalance: chainBalance,
              }}},
              (err) => { if (err) return handleMongoDBerror('Push Sender-Tx to Database', err)}
@@ -344,7 +347,7 @@ io.on('connection', function(socket) {
                   tt0: newTimeToZero,
                   credit: txArray[0],
                   debit: 0,
-                  spendable: Math.floor(newBalance / (1 + setTxFee)),
+                  spendable: Math.floor(newBalance / (1 + setTxFee)) - 1,
                   chainBalance: newBalance,
                 }}},
                 (err) => { if (err) return handleMongoDBerror('Push Recipient-Tx to Database', err)}
@@ -362,7 +365,7 @@ io.on('connection', function(socket) {
                   tt0: newTimeToZero,
                   credit: txArray[0],
                   debit: 0,
-                  spendable: Math.floor(newBalance / (1 + setTxFee)),
+                  spendable: Math.floor(newBalance / (1 + setTxFee)) - 1,
                   chainBalance: newBalance,
                 }}},
                 (err) => { if (err) return handleMongoDBerror('Push Recipient-Tx to Database', err)}
@@ -408,48 +411,68 @@ io.on('connection', function(socket) {
 
   socket.on('tx history', function() {
 
-    TxDB.find({name: socket.user}, { txHistory: { $slice: [ -100, 100 ] } }).exec(function(err, docs) {
+    TxDB.findOne({name: socket.user}, { txHistory: { $slice: [ -100, 100 ] } }).exec(function(err, docs) {
                   if (err) return handleMongoDBerror('Get TX History from DB', err);
                   socket.emit('tx history', docs);
                   })
   });
 
-  socket.on('returning user', function(user, callback) {
+  socket.on('profile', function() {
 
-    UserDB.find().distinct('name')
-      .then((userList) => {
-        if (userList.indexOf(user) != -1) {
-          socket.user = user;
-          sendMessageHistory(user, true );
-          updateUserAccountData([user]);
-          socket.emit('name in header', [ socket.user, commName ] );
+    UserDB.findOne({name: socket.user}).exec(function(err, doc) {
+                  if (err) return handleMongoDBerror('Get TX History from DB', err);
+                  socket.emit('profile', doc);
+                  })
+  });
 
-          UserDB.findOne({ name: user }, function (err, doc) {
+  socket.on('returning user', function(uPhrase, callback) {
+
+    UserDB.findOne({ uPhrase: uPhrase }, function (err, doc) {
+
+        if (err) { return console.log('Error on returning user ' + err); };
+        if (doc === null) {
+          return callback(1);
+        };
+
+        if (doc.uPhrase === uPhrase) {
+
+          socket.user = doc.name;
+          sendMessageHistory(doc.name, uPhrase, true );
+          updateUserAccountData([doc.name]);
+          socket.emit('name in header', [ doc.name, commName ] );
+
             doc.profile.lastLogin = Date.now();
             doc.profile.socketID = String(socket.id);
             doc.save((err) => {
               if (err) {return handleMongoDBerror('Save Returning User to DB', err) };
               updateUserOnlineList();
-              updateUserAccountData([user]);
+              updateUserAccountData([doc.name]);
             });
-          });
-
-          return callback(true);
+          return callback(2);
 
         } else {
-          return callback(false);
+          return callback();
         }
-      })
-      .catch((err) => {
-        console.log('Issue with returning user - ' + err);
 
-      });
+    });
 
   });
 
-  socket.on('new user', function(user, callback) {
+  socket.on('new user', function(userData, callback) {
 
-    UserDB.find().distinct('name')
+    var user = userData[0],
+        uPhrase = userData[1],
+        entry = userData[2];
+
+    if (entry.substring(0,2) === 'vx') {
+       UserDB.findOne({ uPhrase: entry }, function (err, doc) {
+          if (err) { return console.log('Error on returning user ' + err); };
+          doc === null ? callback(false) : socket.emit('set cookies', doc.uPhrase );
+        });
+
+    } else {
+
+      UserDB.find().distinct('name')
         .then((userList) => {
 
             if (userList.indexOf(user) != -1 || user.length > 12 || user.length < 2) {
@@ -459,6 +482,7 @@ io.on('connection', function(socket) {
                 socket.user = user;
                 var newUser = new UserDB({
                   name: user,
+                  uPhrase: uPhrase,
                   profile: {
                     joined: date,
                     lastLogin: date,
@@ -484,7 +508,7 @@ io.on('connection', function(socket) {
                     tt0: baseTimeToZero,
                     credit: initialBalance,
                     debit: 0,
-                    spendable: Math.floor(initialBalance / (1 + setTxFee)),
+                    spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
                     chainBalance: initialBalance,
                   }
                 });
@@ -500,7 +524,7 @@ io.on('connection', function(socket) {
                     tt0: baseTimeToZero,
                     credit: initialBalance,
                     debit: 0,
-                    spendable: Math.floor(initialBalance / (1 + setTxFee)),
+                    spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
                     chainBalance: initialBalance,
                   }
                 });
@@ -514,7 +538,7 @@ io.on('connection', function(socket) {
                 newTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to DB', err) }),
                 newRecentTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to Recent DB', err) })
 
-                sendMessageHistory(user , false );
+                sendMessageHistory(user, uPhrase, false );
 
                 socket.emit('name in header', [ socket.user, commName ] );
 
@@ -529,14 +553,14 @@ io.on('connection', function(socket) {
           console.log('Issue with new user signup - ' + err);
 
         })
-
-
+    }
   });
 
   socket.on('disconnect', function() {
     if(!socket.user) return;
 
     UserDB.findOne({ name: socket.user }, function (err, doc) {
+      if (err || doc === null) { return console.log(err);}
       doc.profile.socketID = 'offline';
       doc.save((err) => {
         if (err) {return handleMongoDBerror('Set User to offline in DB', err) };
@@ -558,26 +582,26 @@ io.on('connection', function(socket) {
   });
 
 
-  function sendMessageHistory(user, retUser) {
+  function sendMessageHistory(user, uPhrase, retUser) {
 
     ChatDB.find({}).sort('-time').limit(100).exec(function(err, docs) {
                   if (err) return handleMongoDBerror('Get Message History from DB', err);
                   socket.emit('chat history', docs.sort('time'), function(callback) {
-                    callback && retUser === true ? welcomeBack(user) : welcomeNew(user);
+                    callback && retUser === true ? welcomeBack(user, uPhrase) : welcomeNew(user, uPhrase);
                   });
-
                });
   }
 
-  function welcomeBack(user) {
-    socket.emit('chat notification', { msg: socket.user + ' - Welcome back to <span class="v">V</span><br/>Remember to enter "help" for help.', symbol: '&#9673;' });
+  function welcomeBack(user, uPhrase) {
+    socket.emit('chat notification', { msg: socket.user + ' - Welcome back!<br/><br/>Remember to enter "help" for help.', symbol: '&#9673;' });
     var recentCredits = constructRecentCredits(user);
   }
 
-  function welcomeNew(user) {
-    socket.emit('chat notification', { msg: user + ' - Welcome to <span class="v">V</span>', symbol: '&#9673;' });
+  function welcomeNew(user, uPhrase) {
+   //    socket.emit('chat notification', { msg: user + ' - Welcome!', symbol: '&#9673;' });
+    socket.emit('chat notification', { msg: user + ' - Welcome to ' + commName + ' Value Banking!<br/><br/><span class="red-text">' + uPhrase + '</span><br/><br/>Note down your unique phrase shown above. It can recover your account and log you in on other devices. You can also find it in your profile.', symbol: '&#9673;' });
     socket.emit('chat notification', { msg: 'Enter "help" at any time to learn about transferring Value to others.', symbol: '&#9673;' });
-    socket.emit('chat notification', { msg: 'Note that you are experimenting with an alpha test version. Your messages and transactions may be deleted without warning.', symbol: '&#9673;' });
+    socket.emit('chat notification', { msg: 'Note that you are still experimenting with an alpha test version. Your messages and transactions may be deleted without warning.', symbol: '&#9673;' });
     socket.emit('chat notification', { msg: 'We recommend using Firefox as browser.', symbol: '&#9673;' });
 
   }
@@ -649,7 +673,7 @@ io.on('connection', function(socket) {
                snapTimeStamp = Math.floor(Date.now() / 1000),
                remainingTimeToZero = userAcc.lastMove + userAcc.timeToZero - snapTimeStamp,
                burnedUserBalance = Math.ceil(userAcc.balance - ( userAcc.balance / (userAcc.timeToZero / ( snapTimeStamp - userAcc.lastMove )))),
-               spendable = Math.floor(burnedUserBalance / (1 + setTxFee));
+               spendable = Math.floor(burnedUserBalance / (1 + setTxFee)) - 1;
 
 
            res.profile.socketID != 'offline' ?
@@ -695,7 +719,7 @@ function updateVisualizationsF() {
             snapTimeStamp = Math.floor(Date.now() / 1000),
             remainingTimeToZero = userAcc.lastMove + userAcc.timeToZero - snapTimeStamp,
             burnedUserBalance = Math.ceil(userAcc.balance - ( userAcc.balance / (userAcc.timeToZero / ( snapTimeStamp - userAcc.lastMove )))),
-            spendable = Math.floor(burnedUserBalance / (1 + setTxFee));
+            spendable = Math.floor(burnedUserBalance / (1 + setTxFee)) - 1;
 
 
         res[i].profile.socketID != 'offline' ?
@@ -742,7 +766,7 @@ function ubiEmit() {
           tt0: remainingTimeToZero,
           credit: ubi,
           debit: 0,
-          spendable: Math.floor(newBalance / (1 + setTxFee)),
+          spendable: Math.floor(newBalance / (1 + setTxFee)) - 1,
           chainBalance: newBalance,
         }}},
         (err) => { if (err) return handleMongoDBerror('Push UBI Tx to DB', err) }
