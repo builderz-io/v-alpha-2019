@@ -6,7 +6,7 @@ var baseTimeToZero = 60 * 60 * 24 * 120,  // expressed in sec
     ubi = 2,  // amount V
     updateVisFreq = 60 * 5,  // expressed in sec
     setTxFee = 0.5,  // express in decimal number such as 0.5 for 50%
-    commName = 'Enkel Collective';  // the community name as String
+    commName = 'Value Instrument';  // the community name as String
 
 // set production
 
