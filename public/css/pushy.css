@@ -183,6 +183,7 @@ bottom: 0;
 .pushy-submenu > a,
 .pushy-submenu > button {
   position: relative;
+  font-size: 0.61em;
 }
 .pushy-submenu > a::after,
 .pushy-submenu > button::after {

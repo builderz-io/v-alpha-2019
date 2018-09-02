@@ -6,7 +6,7 @@ var daysToZero = 120,  // integer
     baseTimeToZero = 60 * 60 * 24 * daysToZero,  // expressed in sec
     ubiInterval = 60 * 60 * 24,  // expressed in sec
     initialBalance = 120,  // amount V
-    ubi = 12,  // amount V
+    ubi = 22,  // amount V
     updateVisFreq = 60 * 15,  // expressed in sec
     setTxFee = 0.35,  // express in decimal number such as 0.5 for 50%
     commName = 'Value Instrument';  // the community name as String
@@ -694,7 +694,7 @@ io.on('connection', function(socket) {
 
   function animateSpendable () {
      setTimeout(function () {
-       socket.emit('user account data', { 'spendable': aniLoop * 2, 'rt0': baseTimeToZero/60/60/24 - aniEnd + aniLoop, 'balance': initialBalance, 'at0': baseTimeToZero/60/60/24, 'dt0': daysToZero } );
+       socket.emit('user account data', { 'spendable': aniLoop * 2, 'rt0': Math.floor(baseTimeToZero/60/60/24 - aniEnd + aniLoop), 'balance': initialBalance, 'at0': Math.floor(baseTimeToZero/60/60/24), 'dt0': daysToZero } );
         aniLoop++;
         if (aniLoop < aniEnd + 1) {
            animateSpendable();
