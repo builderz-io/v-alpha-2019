@@ -1,11 +1,14 @@
+// Value Instrument Alpha | Version 0.2.0 | Apache 2.0 License | https://github.com/valueinstrument/vi-alpha
+
 // set UBI variables
 
-var baseTimeToZero = 60 * 60 * 24 * 120,  // expressed in sec
-    ubiInterval = 60 * 60 * 6,  // expressed in sec
+var daysToZero = 120,  // integer
+    baseTimeToZero = 60 * 60 * 24 * daysToZero,  // expressed in sec
+    ubiInterval = 60 * 60 * 24,  // expressed in sec
     initialBalance = 120,  // amount V
-    ubi = 2,  // amount V
-    updateVisFreq = 60 * 5,  // expressed in sec
-    setTxFee = 0.5,  // express in decimal number such as 0.5 for 50%
+    ubi = 22,  // amount V
+    updateVisFreq = 60 * 15,  // expressed in sec
+    setTxFee = 0.35,  // express in decimal number such as 0.5 for 50%
     commName = 'Value Instrument';  // the community name as String
 
 // set production
@@ -23,7 +26,7 @@ var d3 = require("d3");
 var moment = require('moment');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://localhost/vi-alpha', function (err) {
+mongoose.connect('mongodb://localhost/' + commName.replace(' ', '-'), function (err) {
   if (err) {
     console.log(err);
   } else {
@@ -677,7 +680,7 @@ io.on('connection', function(socket) {
 
 
            res.profile.socketID != 'offline' ?
-                  io.sockets.connected[res.profile.socketID].emit('user account data', { 'spendable': spendable, 'rt0': Math.floor(remainingTimeToZero/60/60/24), 'balance': userAcc.balance, 'at0': Math.floor(userAcc.timeToZero/60/60/24) } ) : false;
+                  io.sockets.connected[res.profile.socketID].emit('user account data', { 'spendable': spendable, 'rt0': Math.floor(remainingTimeToZero/60/60/24), 'balance': userAcc.balance, 'at0': Math.floor(userAcc.timeToZero/60/60/24), 'dt0': daysToZero } ) : false;
 
        });
      }
@@ -691,7 +694,7 @@ io.on('connection', function(socket) {
 
   function animateSpendable () {
      setTimeout(function () {
-       socket.emit('user account data', { 'spendable': aniLoop * 2, 'rt0': baseTimeToZero/60/60/24 - aniEnd + aniLoop, 'balance': initialBalance, 'at0': baseTimeToZero/60/60/24 } );
+       socket.emit('user account data', { 'spendable': aniLoop * 2, 'rt0': Math.floor(baseTimeToZero/60/60/24 - aniEnd + aniLoop), 'balance': initialBalance, 'at0': Math.floor(baseTimeToZero/60/60/24), 'dt0': daysToZero } );
         aniLoop++;
         if (aniLoop < aniEnd + 1) {
            animateSpendable();
@@ -723,7 +726,7 @@ function updateVisualizationsF() {
 
 
         res[i].profile.socketID != 'offline' ?
-               io.sockets.connected[res[i].profile.socketID].emit('user account data', { 'spendable': spendable, 'rt0': Math.floor(remainingTimeToZero/60/60/24), 'balance': userAcc.balance, 'at0': Math.floor(userAcc.timeToZero/60/60/24) } ) : false;
+               io.sockets.connected[res[i].profile.socketID].emit('user account data', { 'spendable': spendable, 'rt0': Math.floor(remainingTimeToZero/60/60/24), 'balance': userAcc.balance, 'at0': Math.floor(userAcc.timeToZero/60/60/24), 'dt0': daysToZero } ) : false;
       }
    });
 }
