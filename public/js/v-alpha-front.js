@@ -15,27 +15,27 @@
    var windowHeight = $( window ).height();  // get device height to set pushy height
    $("#container").height(windowHeight);
 
-   navigator.cookieEnabled ? Cookies.get("uPhrase") ? returningUser() : newUser() : $('#register-error').html('You must have Cookies enabled in your browser for this web app to function.');
+   navigator.cookieEnabled ? Cookies.get("uPhrase") ? returningUser() : newUser() : $('#system-message').html('You must have Cookies enabled in your browser for this web app to function.');
 
    function returningUser() {
 
       socket.emit('returning user', Cookies.get("uPhrase"), function(callback) {
         if (callback === 1) {
           Cookies.remove('uPhrase');
-          $('#register-error').html('Please register again. The app has been updated since your last visit.');
+          $('#system-message').html('Please register again. The app has been updated since your last visit.');
           $('#new-user-form').show();
           $('#user-name').attr('placeholder','Enter your preferred name');
 
         } else if (callback === 2) {
                 $('#new-user-form').hide();
-                $('#register-error').hide();
+                $('#system-message').hide();
                 $('#container').show();
                 $('#chat-message-form').show();
                 $('#menu-button').show();
                 autoScroll();
 
         } else {
-          $('#register-error').html('Your unique phrase (saved as a cookie on your device) does not match. Contact the community admin.');
+          $('#system-message').html('Your unique phrase (saved as a cookie on your device) does not match. Contact the community admin.');
 
         }
       });
@@ -56,14 +56,14 @@
          if (callback) {
                Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
                $('#new-user-form').hide();
-               $('#register-error').hide();
+               $('#system-message').hide();
                $('#container').show();
                $('#chat-message-form').show();
                $('#menu-button').show();
                autoScroll();
 
          } else {
-           $('#register-error').html('Please choose another name. This one was taken or void. Must be within 2 to 12 letters.')
+           $('#system-message').html('Please choose another name. This one was taken or void. Must be within 2 to 12 letters.')
          }
        });
        $('#user-name').val('');
@@ -216,7 +216,7 @@
    socket.on('nukeme', function() {
 
      Cookies.remove('uPhrase');
-     $('body').html('<div id="register-error">Account removed. Reload the page to start over.');
+     $('body').html('<div id="system-message">Account removed. Reload the page to start over.');
 
    });
 
@@ -497,15 +497,37 @@
    socket.on('profile', function(data){
      $('.page-title').html('Your Account Profile');
      console.log(data);
-     $('.page-pipe').html('You are logged in as ' + data.name + '. <br/><br/>Your karma in community participation is ' + data.profile.karma + ' of 10.<br/><br/>Your unique phrase is ' + data.uPhrase + '<br/><br/>Note this phrase down. It can recover your account and log you in on other devices.');
+     $('.page-pipe').html('You joined as ' + data.name + '. <br/><br/>Your karma in community participation is ' + data.profile.karma + ' of 10.<br/><br/>Your unique phrase is ' + data.uPhrase + '<br/><br/>Note this phrase down. It can recover your account and log you in on other devices.');
    });
+
+   $('#offline-btn').click(function(){
+     openPage();
+     $('.page-title').html('Really go offline?');
+     $('.page-pipe').html('<p class="notification-container">Your unique phrase is<br/><br/><span style="red-text">' + Cookies.get("uPhrase") + '</span><br/><br/></p><button id="go-offline">Yes, I noted it down. Go offline now.</button><br/><br/><button id="cancel-offline">Cancel</button>');
+   });
+
+   // go offline
+   $(document).on('click', '#go-offline', function(){
+     socket.disconnect();
+     $('body').html('<div id="system-message">You\'ve gone offline. Reload the page to start over.');
+     Cookies.remove('uPhrase');
+   });
+
 
    // close page
    $('.fa-times-circle').click(function(){
-	   $('#page').hide();
+	   closePage()
+	 });
+
+   $(document).on('click', '#cancel-offline', function(){
+     closePage()
+   });
+
+   function closePage() {
+     $('#page').hide();
      $('#chat-message-form').show();
      $('#menu-button').show();
-	 });
+   }
 
    // open page
    function openPage() {

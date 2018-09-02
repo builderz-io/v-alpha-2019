@@ -138,7 +138,7 @@ input:focus, button:focus {
   font-size: 0.8em;
 }
 
-#register-error {
+#system-message {
     color: coral;
     margin: 10px 0;
     position: fixed;
@@ -198,6 +198,12 @@ input:focus, button:focus {
 
 #account-data-table { width: 100%; font-size: 0.6em }
 .align-right { text-align: right;padding-right: 3px;  }
+
+.front-page-help {
+  color: lightgrey;
+  font-size: 0.8em;
+  text-decoration: none;
+}
 
 
 .fa-telegram-plane {
