@@ -121,6 +121,21 @@ input:focus, button:focus {
     outline: 0;
 }
 
+#go-offline {
+  padding: 14px;
+  font-family: raleway, sans-serif;
+  background-color: lightgreen;
+  border: none;
+  }
+
+#cancel-offline {
+  padding: 14px;
+  font-family: raleway, sans-serif;
+  background-color: orangered;
+  border: none;
+  color: white;
+}
+
 ::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   font-size: 0.7em;
 }
