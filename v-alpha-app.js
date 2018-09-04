@@ -423,8 +423,16 @@ io.on('connection', function(socket) {
   socket.on('profile', function() {
 
     UserDB.findOne({name: socket.user}).exec(function(err, doc) {
-                  if (err) return handleMongoDBerror('Get TX History from DB', err);
+                  if (err) return handleMongoDBerror('Get user profile from DB', err);
                   socket.emit('profile', doc);
+                  })
+  });
+
+  socket.on('about community', function() {
+
+    UserDB.findOne({name: socket.user}).exec(function(err, doc) {
+                  if (err) return handleMongoDBerror('Get community info from DB', err);
+                  socket.emit('about community', doc);
                   })
   });
 

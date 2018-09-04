@@ -1,4 +1,4 @@
-#container, #chat-message-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification, #page {
+#container, #chat-message-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification, #page, #map {
    display: none;
 }
 
@@ -28,6 +28,8 @@ list-style-type: none;
 
 }
 
+#map { height: 300px }
+
 .message-container {
   margin-bottom: 10px;
   margin-top: 5px;
@@ -44,7 +46,7 @@ list-style-type: none;
 
 #bottom-row {
   background: #000;
-  padding: 6px 4px;
+  padding: 4px 4px;
   width: 100%;
   z-index: 1000;
   height: 48px;
@@ -77,6 +79,10 @@ list-style-type: none;
   list-style-type: none;
     margin-left: 20px;
     padding: 0;
+}
+
+.mapboxgl-popup {
+  max-width: 200px;
 }
 
 .form-width {
@@ -116,6 +122,25 @@ form button {
   font-size: 1.0em;
   text-align: center;
 }*/
+
+#add-location {
+    padding: 17px;
+    border: none;
+    background: lightgrey;
+    font-size: 1.1em;
+    float: left;
+    width: 49%;
+}
+
+#search-location {
+    padding: 17px;
+    border: none;
+    background: lightgrey;
+    font-size: 1.1em;
+    float: right;
+    width: 50%;
+
+}
 
 input:focus, button:focus {
     outline: 0;
@@ -227,7 +252,7 @@ input:focus, button:focus {
 }
 
 .fa-bars {
-  padding: 2px 5px 0px 2px;
+  padding: 2px 3px 0px 1px;
     font-size: 1.05em;
 }
 
@@ -311,8 +336,8 @@ margin-bottom: 1px;
 }
 
 .tx-type {
-  padding-right: 4px;
-  font-size: 0.74em;
+  padding-right: 5px;
+  font-size: 0.6em;
   top: 3px;
   position: relative;
 }
@@ -339,10 +364,9 @@ width: 28px;
 
 }
 .tx-balance {
-  padding-right: 12px;
 }
 .tx-fee {
-
+padding-left: 12px;
 }
 .tx-burned {
 

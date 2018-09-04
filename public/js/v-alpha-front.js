@@ -12,6 +12,8 @@
        { spendable: 0 }
    ];
 
+   var headerRight = '';
+
    var windowHeight = $( window ).height();  // get device height to set pushy height
    $("#container").height(windowHeight);
 
@@ -171,6 +173,7 @@
    socket.on('name in header', function(name) {
      $('#user-in-header').html(name[0]);
      $('#header-right').html(name[1]);
+     headerRight = name[1];
      $('title').html(name[1] + ' - Value Alpha');
    });
 
@@ -419,7 +422,7 @@
            table.appendChild(tableBody);
 
        var thCells = ['&nbsp;', 'Date', '&nbsp;', 'Time', 'Who', 'Reference', '<span class="v">V</span>', '&nbsp;', 'Chain', 'Fee', 'Burn', 'Days'];
-       var thCellClasses = ['tx-type', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit align-right', 'tx-v-sign', 'tx-balance align-right', 'tx-fee align-right', 'tx-burned align-right hide-cell', 'tx-tt0 align-right hide-cell'];
+       var thCellClasses = ['tx-type', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit align-right', 'tx-v-sign', 'tx-balance align-right', 'tx-fee align-right hide-cell', 'tx-burned align-right hide-cell', 'tx-tt0 align-right hide-cell'];
        var thRow = tableHead.insertRow(0);
 
        for (var i=0; i<thCells.length; i++) {
@@ -452,7 +455,7 @@
 
                          ];
 
-             var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-v-sign green-text', 'tx-balance straight-number align-right', 'tx-fee  straight-number align-right', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
+             var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-v-sign green-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right hide-cell', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
 
            } else {
 
@@ -470,7 +473,7 @@
                           Math.floor(tx.tt0/60/60/24),
                         ];
 
-             var cellClasses = ['tx-type red-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number red-text align-right', 'tx-v-sign red-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right', 'tx-burned straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
+             var cellClasses = ['tx-type red-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number red-text align-right', 'tx-v-sign red-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right hide-cell', 'tx-burned straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
 
            }
 
@@ -484,7 +487,7 @@
          }
        };
 
-     $('.page-title').html('Transaction History');
+     $('#header-right').html('Your Transactions');
      $('.page-pipe').html(table);
 
     });
@@ -495,15 +498,32 @@
    });
 
    socket.on('profile', function(data){
-     $('.page-title').html('Your Account Profile');
-     console.log(data);
+     $('#header-right').html('Your Account');
      $('.page-pipe').html('You joined as ' + data.name + '. <br/><br/>Your karma in community participation is ' + data.profile.karma + ' of 10.<br/><br/>Your unique phrase is ' + data.uPhrase + '<br/><br/>Note this phrase down. It can recover your account and log you in on other devices.');
+   });
+
+   $('#location-btn').click(function(){
+     openPage();
+     $('#header-right').html('Offers & Locations');
+     $('.page-pipe').html('<button id="add-location">Add</button><button id="search-location">Search</button>');
+     $('#map').show();
+   });
+
+   $('#about-btn').click(function(){
+     openPage();
+     socket.emit('about community');
+   });
+
+   socket.on('about community', function(data){
+     $('#header-right').html('Community Statistics');
+     $('.page-pipe').html('You joined this community as ' + data.name );
    });
 
    $('#offline-btn').click(function(){
      openPage();
-     $('.page-title').html('Really go offline?');
-     $('.page-pipe').html('<p class="notification-container">Your unique phrase is<br/><br/><span style="red-text">' + Cookies.get("uPhrase") + '</span><br/><br/></p><button id="go-offline">Yes, I noted it down. Go offline now.</button><br/><br/><button id="cancel-offline">Cancel</button>');
+     $('#header-right').html('Go Offline');
+     $('.page-title').html('Please Confirm');
+     $('.page-pipe').html('<p class="notification-container">Your unique phrase is<br/><br/><span style="red-text">' + Cookies.get("uPhrase") + '</span><br/><br/></p><button id="go-offline">Yes, I noted it down</button><br/><br/><button id="cancel-offline">Cancel</button>');
    });
 
    // go offline
@@ -525,8 +545,13 @@
 
    function closePage() {
      $('#page').hide();
+     $('#map').hide();
      $('#chat-message-form').show();
      $('#menu-button').show();
+     $('#header-right').html(headerRight);
+     $('.page-title').html('');
+
+
    }
 
    // open page

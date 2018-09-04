@@ -59,6 +59,10 @@ blockquote {padding: 16px; background: #eee;}
     color: #ffc100;
   }
 
+  #bottom-row {
+    padding-top: 6px;
+  }
+
 
 }
 
