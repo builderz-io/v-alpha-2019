@@ -307,7 +307,7 @@
                  .text(text)
                  .attr({
                      'text-anchor':'middle',
-                     y:y+10
+                     y:y+14
                  })
                  .style({
                      fill:'#41B787',

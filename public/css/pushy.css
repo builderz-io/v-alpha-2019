@@ -176,6 +176,8 @@ bottom: 0;
   text-align: left;
   background: transparent;
   border: 0;
+  font-family: inherit;
+
 }
 /* .pushy-submenu button:hover {
   color: #ffc100;
@@ -183,7 +185,8 @@ bottom: 0;
 .pushy-submenu > a,
 .pushy-submenu > button {
   position: relative;
-  font-size: 0.61em;
+  font-size: 0.7em;
+  font-family: inherit;
 }
 .pushy-submenu > a::after,
 .pushy-submenu > button::after {

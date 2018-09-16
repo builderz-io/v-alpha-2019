@@ -47,7 +47,8 @@
 	<link rel="stylesheet" href="/css/style.css" />
 	<link rel="stylesheet" href="/css/app.css" />
 	<link rel="stylesheet" href="/css/pushy.css" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato|Raleway">
+	<!-- link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato|Raleway" -->
+	<link href="https://fonts.googleapis.com/css?family=Prompt:200" rel="stylesheet">
 
 	<!-- Map -->
 
@@ -218,14 +219,24 @@
 	.setPopup(popup2)
 	.addTo(map);
 
-  /*
+	var marker3 = false;
+
 	map.on('click', addMarker);
   function addMarker(e){
-		var marker3 = new mapboxgl.Marker()
-		.setLngLat(e.lngLat)
-		.setPopup(popup2)
-		.addTo(map);
-  } */
+
+		if (marker3 != false) {
+      marker3.remove();
+      marker3 = false;
+
+
+	  } else {
+		  marker3 = new mapboxgl.Marker()
+			.setLngLat(e.lngLat)
+			.setPopup(popup2)
+			.addTo(map);
+
+		}
+  }
 
 
 </script>
