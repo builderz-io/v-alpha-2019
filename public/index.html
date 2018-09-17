@@ -149,9 +149,6 @@
 			<div class="page-title"></div>
 			<div class="map-wrapper">
 			  <div id="map">
-					<script>
-						map.resize();
-					</script>
 				</div>
 			</div>
 			<div class="page-pipe"></div>
@@ -169,12 +166,16 @@
   <div id="bottom-row" class="">
 		<button id="menu-button" class="button menu-btn"><i class="fas fa-bars"></i></i></button> <!-- &#9776; -->
 
-    <form id="chat-message-form" class="" action="">
+    <!--form id="chat-message-form" class="" action="">
     	<div class="form-width"><input id="message-text" autocomplete="off" placeholder="Message all or send value"/><button id="send-button" class="button send-btn"><i class="fab fa-telegram-plane"></i></button></div>
-    </form>
+    </form -->
 
 	  <form id="new-user-form" class="register-form" action="">
 		  <input id="user-name" autocomplete="off" placeholder="Enter your preferred name" autofocus/><button class="button join-btn">Join</button>
+	  </form>
+
+		<form id="textarea-form" class="" action="">
+		  <div class="form-width"><textarea id="textarea-text" class='autoExpand' rows='1' data-min-rows='1'></textarea></div><button id="textarea-button" class="button send-btn"><i class="fab fa-telegram-plane"></i></button>
 	  </form>
   </div>
 

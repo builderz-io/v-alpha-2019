@@ -1,4 +1,4 @@
-#container, #chat-message-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification, #page, #map {
+#container, #textarea-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification, #page, #map {
    display: none;
 }
 
@@ -143,7 +143,7 @@ form button {
 
 }
 
-input:focus, button:focus {
+input:focus, button:focus, textarea:focus {
     outline: 0;
 }
 
@@ -304,6 +304,27 @@ margin-bottom: 1px;
 
 .btn-in-menu {
 
+}
+
+textarea {
+  /* display: block; */
+  box-sizing: padding-box;
+  /* overflow: hidden; */
+  padding: 4px 16px;
+  max-width: 520px;
+  font-size: 1em;
+  border-radius: 20px;
+  border: 0px solid #000;
+  background: lavender;
+  font-family: inherit;
+  width: 63%;
+  bottom: 5px;
+  position: absolute;
+}
+
+.send-btn {
+  position: relative;
+  left: 65%;
 }
 
 

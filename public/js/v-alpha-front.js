@@ -60,7 +60,7 @@
                $('#new-user-form').hide();
                $('#system-message').hide();
                $('#container').show();
-               $('#chat-message-form').show();
+               $('#textarea-form').show();
                $('#menu-button').show();
                autoScroll();
 
@@ -72,7 +72,7 @@
        return false;
    });
 
-   $('#chat-message-form').submit(function(){
+  $('#chat-message-form').submit(function(){
      var message = $('#message-text').val();
 
      if (message === '') {
@@ -570,6 +570,70 @@
            };
 
    });
+
+// Textareas - applied globally on all textareas with the "autoExpand" class
+   $(document)
+    .one('focus.autoExpand', 'textarea.autoExpand', function(){
+        var savedValue = this.value;
+        this.value = '';
+        this.baseScrollHeight = this.scrollHeight;
+        this.value = savedValue;
+    })
+    .on('input.autoExpand', 'textarea.autoExpand', function(){
+        var minRows = this.getAttribute('data-min-rows')|0, rows;
+        this.rows = minRows;
+        rows = Math.ceil((this.scrollHeight - this.baseScrollHeight) / 16);
+        this.rows = minRows + rows ;
+    });
+
+    // Get the input field
+    var input = document.getElementById("textarea-text");
+
+    // Execute a function when the user releases a key on the keyboard
+    input.addEventListener("keyup", function(event) {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      // Number 13 is the "Enter" key on the keyboard
+      if (event.keyCode === 13) {
+        // Trigger the button element with a click
+        document.getElementById("textarea-button").click();
+      }
+    });
+
+    $('#textarea-form').submit(function(){
+      var message = $('#textarea-text').val();
+
+      if (message === '') {
+            // no message was entered, so nothing happens
+      } else {   // does message include trigger words?
+
+        var messageParts = checkForTriggers(message);
+
+        if (!messageParts) { // if message is good and no trigger word was detected, it is not a transaction, therefore just send message into chat
+
+          socket.emit('chat message', message);
+
+        } else {
+
+          if (messageParts.length === 1 && messageParts[0] === 'help') {   // does message include trigger word "help"?
+
+            $('#messages-ul').append('<li class="notification-container"><p>' + '&#9673;' + ' ' + 'Use "send", "pay" or "+" at the start of your message to trigger a transaction. Followed by one or several amounts and then one or several recipients. You can "send 15 to mary" or "send mary 15". In short enter "+15 mary". You can also add numbers by entering "+15 5 20 mary peter". This results in 40 being transferred to each, Mary and Peter. You can specify e.g. "for guitar lessons" at the very end of the message to include a reference. Try it now!' + '</p><p class="time-right">' + moment().format('D MMM YYYY h:mm a') + '</p></li>');
+            autoScroll();
+
+          } else if (messageParts[0] === 'nukeme'){
+            socket.emit('nukeme');
+
+          } else {
+
+              socket.emit('transaction', messageParts);
+          }
+        }
+      }
+
+      $('#textarea-text').val('');
+      $('#textarea-text').attr('rows','1');
+      return false;
+    });
 
 
 }(jQuery));
