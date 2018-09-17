@@ -72,40 +72,6 @@
        return false;
    });
 
-/*  $('#chat-message-form').submit(function(){
-     var message = $('#message-text').val();
-
-     if (message === '') {
-           // no message was entered, so nothing happens
-     } else {   // does message include trigger words?
-
-       var messageParts = checkForTriggers(message);
-
-       if (!messageParts) { // if message is good and no trigger word was detected, it is not a transaction, therefore just send message into chat
-
-         socket.emit('chat message', message);
-
-       } else {
-
-         if (messageParts.length === 1 && messageParts[0] === 'help') {   // does message include trigger word "help"?
-
-           $('#messages-ul').append('<li class="notification-container"><p>' + '&#9673;' + ' ' + 'Use "send", "pay" or "+" at the start of your message to trigger a transaction. Followed by one or several amounts and then one or several recipients. You can "send 15 to mary" or "send mary 15". In short enter "+15 mary". You can also add numbers by entering "+15 5 20 mary peter". This results in 40 being transferred to each, Mary and Peter. You can specify e.g. "for guitar lessons" at the very end of the message to include a reference. Try it now!' + '</p><p class="time-right">' + moment().format('D MMM YYYY h:mm a') + '</p></li>');
-           autoScroll();
-
-         } else if (messageParts[0] === 'nukeme'){
-           socket.emit('nukeme');
-
-         } else {
-
-             socket.emit('transaction', messageParts);
-         }
-       }
-     }
-
-     $('#message-text').val('');
-     return false;
-   }); */
-
    function checkForTriggers(message) {
      var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme'];
 
@@ -132,14 +98,11 @@
          $('#messages-ul li:last-child p:first-child span:first-child').html() === data.sender ?
             appendChatMessage(data) : newChatMessage(data);
             autoScroll();
-
-
    });
 
    function newChatMessage(data) {
      $('#messages-ul').append('<li class="message-container"></li>');
      $('#messages-ul li:last-child').html('<p class="message-sender"><span class="strong-weight">' + data.sender + '</span> <span class="time"> ' + moment(data.time).format('D MMM YYYY h:mm a') + '</span></p><p class="message-p">' + data.msg + '</p>');
-
    }
 
    function appendChatMessage(data) {
@@ -452,7 +415,6 @@
                           '',
                           tx.burned,
                           Math.floor(tx.tt0/60/60/24),
-
                          ];
 
              var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-v-sign green-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right hide-cell', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
@@ -550,8 +512,6 @@
      $('#menu-button').show();
      $('#header-right').html(headerRight);
      $('.page-title').html('');
-
-
    }
 
    // open page
@@ -624,8 +584,7 @@
             socket.emit('nukeme');
 
           } else {
-
-              socket.emit('transaction', messageParts);
+            socket.emit('transaction', messageParts);
           }
         }
       }

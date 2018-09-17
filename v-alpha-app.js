@@ -130,6 +130,14 @@ io.on('connection', function(socket) {
 
   socket.on('chat message', function(message) {
 
+    var link = message.match(/(?:www|https?)[^\s]+/);
+    var http = '';
+
+    if (link != null) {
+        if (!( link[0].match(/(http(s?))\:\/\//) ) ) { var http = 'http://'; };
+        var message = message.replace(/(?:www|https?)[^\s]+/,'<a href="' + http + link + '" target="_blank">' + link + '</a>');
+    }
+
     var newMsg = new ChatDB({msg: message, sender: socket.user, time: Date.now()});
 
     newMsg.save(function(err) {
