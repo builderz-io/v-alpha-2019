@@ -32,7 +32,7 @@
                 $('#new-user-form').hide();
                 $('#system-message').hide();
                 $('#container').show();
-                $('#chat-message-form').show();
+                $('#textarea-form').show();
                 $('#menu-button').show();
                 autoScroll();
 
@@ -72,7 +72,7 @@
        return false;
    });
 
-  $('#chat-message-form').submit(function(){
+/*  $('#chat-message-form').submit(function(){
      var message = $('#message-text').val();
 
      if (message === '') {
@@ -104,7 +104,7 @@
 
      $('#message-text').val('');
      return false;
-   });
+   }); */
 
    function checkForTriggers(message) {
      var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme'];
@@ -207,7 +207,7 @@
 
    socket.on('disconnect', function() {
 
-       $('#chat-message-form').hide();
+       $('#textarea-form').hide();
        $('#menu-button').hide();
        $('#spendable-in-header').hide();
        $('#disconnected-notification').show();
@@ -546,7 +546,7 @@
    function closePage() {
      $('#page').hide();
      $('#map').hide();
-     $('#chat-message-form').show();
+     $('#textarea-form').show();
      $('#menu-button').show();
      $('#header-right').html(headerRight);
      $('.page-title').html('');
@@ -556,7 +556,7 @@
 
    // open page
    function openPage() {
-     $('#chat-message-form').hide();
+     $('#textarea-form').hide();
      $('#menu-button').hide();
      $('#page').show();
    }
