@@ -9,7 +9,7 @@ var daysToZero = 120,  // integer
     ubi = 22,  // amount V
     updateVisFreq = 60 * 15,  // expressed in sec
     setTxFee = 0.35,  // express in decimal number such as 0.5 for 50%
-    commName = 'Value Instrument';  // the community name as String
+    commName = 'Value Instrument'; // the community name as String
 
 // set production
 
@@ -114,62 +114,66 @@ UserDB.find().select('profile').exec((err, res) => {
 
 (function() {
   var date = Date.now();
-  var user = 'Zadmin'
+  const credentials = require('./admin-credentials.js');
 
-  var adminUser = new UserDB({
-    name: user,
-    uPhrase: 'vxK2jiViB2WIMV4X53AAAD',
-    profile: {
-      joined: date,
-      lastLogin: date,
+  for (i = 0; i < credentials.admin.length; i++) {
+    var user = credentials.admin[i];
+
+    var adminUser = new UserDB({
       name: user,
-      karma: 10,
-      socketID: String('offline'),
-    },
-    onChain: {
-      balance: initialBalance,
-      lastMove: Number(Math.floor(date / 1000)),
-      timeToZero: baseTimeToZero,
-    }
-  });
+      uPhrase: credentials.uPhrase[i],
+      profile: {
+        joined: date,
+        lastLogin: date,
+        name: user,
+        karma: 10,
+        socketID: String('offline'),
+      },
+      onChain: {
+        balance: initialBalance,
+        lastMove: Number(Math.floor(date / 1000)),
+        timeToZero: baseTimeToZero,
+      }
+    });
 
-  var newTx = new TxDB({
-    name: user,
-    txHistory: {
-      date: date,
-      from: commName,
-      to: user,
-      for: 'Welcome Balance',
-      senderFee: 0,
-      burned: 0,
-      tt0: baseTimeToZero,
-      credit: initialBalance,
-      debit: 0,
-      spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
-      chainBalance: initialBalance,
-    }
-  });
+    var newTx = new TxDB({
+      name: user,
+      txHistory: {
+        date: date,
+        from: commName,
+        to: user,
+        for: 'Welcome Balance',
+        senderFee: 0,
+        burned: 0,
+        tt0: baseTimeToZero,
+        credit: initialBalance,
+        debit: 0,
+        spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
+        chainBalance: initialBalance,
+      }
+    });
 
-  var newRecentTx = new RecentTxDB({
-    name: user,
-    txHistory: {
-      date: date,
-      from: commName,
-      to: user,
-      for: 'Welcome Balance',
-      senderFee: 0,
-      burned: 0,
-      tt0: baseTimeToZero,
-      credit: initialBalance,
-      debit: 0,
-      spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
-      chainBalance: initialBalance,
-    }
-  });
+    var newRecentTx = new RecentTxDB({
+      name: user,
+      txHistory: {
+        date: date,
+        from: commName,
+        to: user,
+        for: 'Welcome Balance',
+        senderFee: 0,
+        burned: 0,
+        tt0: baseTimeToZero,
+        credit: initialBalance,
+        debit: 0,
+        spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
+        chainBalance: initialBalance,
+      }
+    });
 
-  newTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to DB', err) });
-  newRecentTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to Recent DB', err) });
-  adminUser.save((err) => { if (err) {return handleMongoDBerror('Save Admin to DB', err) }; });
+    newTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to DB', err) });
+    newRecentTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to Recent DB', err) });
+    adminUser.save((err) => { if (err) {return handleMongoDBerror('Save Admin to DB', err) }; });
+  }
 })();
 
 
