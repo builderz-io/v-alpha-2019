@@ -13,7 +13,7 @@ var daysToZero = 120,  // integer
 
 // set production
 
-var production = false;
+var production = true;
 
 // system init
 
@@ -25,6 +25,8 @@ var path = require('path');
 var d3 = require("d3");
 var moment = require('moment');
 var mongoose = require('mongoose');
+
+const credentials = require('./admin-credentials.js');
 
 mongoose.connect('mongodb://localhost/' + commName.replace(' ', '-'), function (err) {
   if (err) {
@@ -55,8 +57,10 @@ var msgSchema = mongoose.Schema({
 var userSchema = mongoose.Schema({
   name: String,
   uPhrase: String,
+  role: String,
   profile: {
     name: String,
+    role: String,
     karma: Number,
     socketID: String,
     joined: Date,
@@ -114,7 +118,6 @@ UserDB.find().select('profile').exec((err, res) => {
 
 (function() {
   var date = Date.now();
-  const credentials = require('./admin-credentials.js');
 
   for (i = 0; i < credentials.admin.length; i++) {
     var user = credentials.admin[i];
@@ -122,10 +125,12 @@ UserDB.find().select('profile').exec((err, res) => {
     var adminUser = new UserDB({
       name: user,
       uPhrase: credentials.uPhrase[i],
+      role: 'admin',
       profile: {
         joined: date,
         lastLogin: date,
         name: user,
+        role: 'admin',
         karma: 10,
         socketID: String('offline'),
       },
@@ -182,7 +187,7 @@ UserDB.find().select('profile').exec((err, res) => {
 
 ChatDB.estimatedDocumentCount().exec((err, res) => {
     if (res < 1) {
-      var firstMsg = new ChatDB({msg: 'Hello World! This is ' + commName + ' Value Banking ... tune your radio ...<br/><br/>', sender: commName, time: Date.now() });
+      var firstMsg = new ChatDB({msg: 'Hello World! This is ' + commName + ' Value Banking ... <br/><br/>', sender: commName, time: Date.now() });
       firstMsg.save((err) => { if (err) return handleMongoDBerror('Write first chat message to DB', err) });
     }
 })
@@ -213,6 +218,55 @@ io.on('connection', function(socket) {
       io.emit('chat message', {msg: message, sender: socket.user, time: Date.now()});
     });
   });
+
+  socket.on('verify', function(data) {
+
+    if (credentials.uPhrase.indexOf(data[0]) != -1) {
+
+      UserDB.findOne({name: forceNiceLookingName(data[1]) }).exec( (err, res) => {
+        if (err || res === null) {
+          socket.emit('chat notification', { msg: '<span class="red-text">' + forceNiceLookingName(data[1]) + ' not found', symbol: '&#9673;' });
+          return handleMongoDBerror('Verify User in DB', err);
+        }
+        res.profile.role = 'member';
+        res.role = 'member';
+        res.save((err) => {
+          if (err) {return handleMongoDBerror('Verify User in DB', err)};
+          updateUserOnlineList();
+          socket.emit('chat notification', { msg: '<span class="green-text">You verified ' + forceNiceLookingName(data[1]), symbol: '&#9673;' });
+        });
+      });
+    } else {
+      socket.emit('chat notification', { msg: '<span class="red-text">You are not authorized to verify members', symbol: '&#9673;' });
+    }
+  })
+
+  socket.on('grace', function(data) {
+
+    if (credentials.uPhrase.indexOf(data[0]) != -1) {
+
+      UserDB.findOne({name: forceNiceLookingName(data[1]) }).exec( (err, res) => {
+        if (err || res === null) {
+          socket.emit('chat notification', { msg: '<span class="red-text">' + forceNiceLookingName(data[1]) + ' not found', symbol: '&#9673;' });
+          return handleMongoDBerror('Verify User in DB', err);
+        }
+        var name = res.profile.name;
+        res.profile.role = 'grace';
+        res.role = 'grace';
+        res.profile.name = name + 'graced';
+        res.name = name + 'graced';
+        res.profile.socketID = 'offline';
+        res.save((err, res) => {
+          if (err) {return handleMongoDBerror('Verify User in DB', err)};
+          updateUserOnlineList();
+          socket.emit('chat notification', { msg: '<span class="green-text">You set ' + forceNiceLookingName(data[1]) + ' to "grace"', symbol: '&#9673;' });
+          res.profile.socketID != 'offline' ? socket.broadcast.to(res.profile.socketID).emit('account graced') : null;
+        });
+      });
+    } else {
+      socket.emit('chat notification', { msg: '<span class="red-text">You are not authorized to "grace" members', symbol: '&#9673;' });
+    }
+  })
 
   socket.on('transaction', function(messageParts) {
    UserDB.find().distinct('name')
@@ -254,10 +308,6 @@ io.on('connection', function(socket) {
         }
        }
 
-       function forceNiceLookingName(input) {
-         var string = input.replace(/[^A-Za-z]+/g, '').trim().toLowerCase();
-         return string.charAt(0).toUpperCase() + string.slice(1);
-       }
 
      })
      .then((txArray) => {
@@ -520,6 +570,11 @@ io.on('connection', function(socket) {
           return callback(1);
         };
 
+        if (doc.role === 'grace') {
+          socket.emit('account graced');
+          return;
+        }
+
         if (doc.uPhrase === uPhrase) {
 
           socket.user = doc.name;
@@ -569,10 +624,12 @@ io.on('connection', function(socket) {
                 var newUser = new UserDB({
                   name: user,
                   uPhrase: uPhrase,
+                  role: 'network',
                   profile: {
                     joined: date,
                     lastLogin: date,
                     name: user,
+                    role: 'network',
                     karma: 10,
                     socketID: String(socket.id),
                   },
@@ -719,32 +776,39 @@ io.on('connection', function(socket) {
   function updateUserOnlineList() {
 
     UserDB.find({}).select('profile').exec(function(err, res) {
-                  if (err) return handleMongoDBerror('Run updateUserOnlineList from DB', err);
+        if (err) return handleMongoDBerror('Run updateUserOnlineList from DB', err);
 
-                  function compare(a,b) {
-                    if (a.profile.name < b.profile.name)
-                      return -1;
-                    if (a.profile.name > b.profile.name)
-                      return 1;
-                    return 0;
-                  }
+        function compare(a,b) {
+          if (a.profile.name < b.profile.name)
+            return -1;
+          if (a.profile.name > b.profile.name)
+            return 1;
+          return 0;
+        }
 
-                  res.sort(compare);
+        res.sort(compare);
 
-                  var online = '',  // '<li class="member-list">Person 1 <i class="fas fa-user online-user"></i></li><li class="member-list">Person 2 <i class="fas fa-user online-user"></i></li><li class="member-list">Person 3 <i class="fas fa-user online-user"></i></li>',
-                      offline = '' ;  // '<li class="member-list">Person 4 </li><li class="member-list">Person 5 </li><li class="member-list">Person 6 </li>',
+        var online = '',  // '<li class="member-list">Person 1 <i class="fas fa-user online-user"></i></li><li class="member-list">Person 2 <i class="fas fa-user online-user"></i></li><li class="member-list">Person 3 <i class="fas fa-user online-user"></i></li>',
+            offline = '' ;  // '<li class="member-list">Person 4 </li><li class="member-list">Person 5 </li><li class="member-list">Person 6 </li>',
 
-                      for (i = 0; i < res.length; i++) {
-                        if ( res[i].profile.socketID != 'offline' ) {
-                          online += '<li class="member-list">' + res[i].profile.name + ' <i class="fas fa-user online-user"></i></li>';
-                        } else {
-                          offline += '<li class="member-list">' + res[i].profile.name + '</li>';
-                        }
+            for (i = 0; i < res.length; i++) {
 
-                      }
-                      io.sockets.emit('user online list', online + offline);
+              if (res[i].profile.role === 'member' || res[i].profile.role === 'admin') {
+                var verified = ' (verified)' ;
+              } else {
+                var verified = '' ;
+              }
+              if (res[i].profile.role != 'grace') {
+                if ( res[i].profile.socketID != 'offline' ) {
+                  online += '<li class="member-list">' + res[i].profile.name + ' <i class="fas fa-user online-user"></i>' + verified + '</li>';
+                } else {
+                  offline += '<li class="member-list">' + res[i].profile.name + verified + '</li>';
+                }
+              }
+            }
+            io.sockets.emit('user online list', online + offline);
 
-               });
+     });
   }
 
   function updateUserAccountData(userArray) {
@@ -788,6 +852,11 @@ io.on('connection', function(socket) {
 
 }); // end io.on('connection')
 
+
+function forceNiceLookingName(input) {
+  var string = input.replace(/[^A-Za-z]+/g, '').trim().toLowerCase();
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
 //*****************    Update Visualizations Frequently    ********************* //
 

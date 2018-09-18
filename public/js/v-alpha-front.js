@@ -72,20 +72,6 @@
        return false;
    });
 
-   function checkForTriggers(message) {
-     var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme'];
-
-     var messageParts = message.trim().toLowerCase().split(' ');
-
-     if (messageParts[0].charAt(0) === '+') { messageParts.splice(1,0,messageParts[0].slice(1)); messageParts.splice(0,1,messageParts[0].charAt(0)); };
-     if (messageParts[0].substring(0,3) === 'pay') { messageParts.splice(0,0,messageParts[0].substring(0,3)); messageParts.splice(1,1,messageParts[1].substring(3,messageParts[1].length)); };
-     if (messageParts[0].substring(0,4) === 'send' || messageParts[0].substring(0,4) === 'plus' || messageParts[0].substring(0,4) === 'sned' || messageParts[0].substring(0,4) === 'sent' ) { messageParts.splice(0,0,messageParts[0].substring(0,4)); messageParts.splice(1,1,messageParts[1].substring(4,messageParts[1].length)); };
-
-     if (triggers.indexOf(messageParts[0]) != -1) {
-         return messageParts;
-     } else { return false };
-   }
-
    socket.on('set cookies', function(uPhrase) {
      Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
      returningUser();
@@ -186,6 +172,12 @@
 
    });
 
+   socket.on('account graced', function() {
+
+     Cookies.remove('uPhrase');
+     $('body').html('<div id="system-message">Account has been "graced". Contact the community admin to regain access.');
+
+   });
 
    function accountpie() {  // shout out to Abhisek via adeveloperdiary.com
 
@@ -578,6 +570,12 @@
           } else if (messageParts[0] === 'nukeme'){
             socket.emit('nukeme');
 
+          } else if (messageParts[0] === 'verify'){
+            socket.emit('verify', [ Cookies.get("uPhrase"), messageParts[1] ] );
+
+          } else if (messageParts[0] === 'grace'){
+            socket.emit('grace', [ Cookies.get("uPhrase"), messageParts[1] ] );
+
           } else {
             socket.emit('transaction', messageParts);
           }
@@ -588,6 +586,20 @@
       $('#textarea-text').attr('rows','1');
       return false;
     });
+
+    function checkForTriggers(message) {
+      var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme', 'verify', 'grace'];
+
+      var messageParts = message.trim().toLowerCase().split(' ');
+
+      if (messageParts[0].charAt(0) === '+') { messageParts.splice(1,0,messageParts[0].slice(1)); messageParts.splice(0,1,messageParts[0].charAt(0)); };
+      if (messageParts[0].substring(0,3) === 'pay') { messageParts.splice(0,0,messageParts[0].substring(0,3)); messageParts.splice(1,1,messageParts[1].substring(3,messageParts[1].length)); };
+      if (messageParts[0].substring(0,4) === 'send' || messageParts[0].substring(0,4) === 'plus' || messageParts[0].substring(0,4) === 'sned' || messageParts[0].substring(0,4) === 'sent' ) { messageParts.splice(0,0,messageParts[0].substring(0,4)); messageParts.splice(1,1,messageParts[1].substring(4,messageParts[1].length)); };
+
+      if (triggers.indexOf(messageParts[0]) != -1) {
+          return messageParts;
+      } else { return false };
+    }
 
 
 }(jQuery));
