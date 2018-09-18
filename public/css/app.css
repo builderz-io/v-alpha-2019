@@ -312,6 +312,7 @@ textarea {
   /* overflow: hidden; */
   padding: 4px 16px;
   max-width: 520px;
+  max-height: 150px;
   font-size: 1em;
   border-radius: 20px;
   border: 0px solid #000;

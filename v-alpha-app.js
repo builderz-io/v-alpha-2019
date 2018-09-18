@@ -103,23 +103,86 @@ production ? false : RecentTxDB.remove({}, function(err) {
    console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'RecentTxDB collection cleared')
 });
 
-// set all users to offline on start
+// set all users to offline on start and add admin-users
 
 UserDB.find().select('profile').exec((err, res) => {
     res.forEach(res => {
       res.profile.socketID = 'offline';
       res.save();
     })
-  })
+  });
+
+(function() {
+  var date = Date.now();
+  var user = 'Zadmin'
+
+  var adminUser = new UserDB({
+    name: user,
+    uPhrase: 'vxK2jiViB2WIMV4X53AAAD',
+    profile: {
+      joined: date,
+      lastLogin: date,
+      name: user,
+      karma: 10,
+      socketID: String('offline'),
+    },
+    onChain: {
+      balance: initialBalance,
+      lastMove: Number(Math.floor(date / 1000)),
+      timeToZero: baseTimeToZero,
+    }
+  });
+
+  var newTx = new TxDB({
+    name: user,
+    txHistory: {
+      date: date,
+      from: commName,
+      to: user,
+      for: 'Welcome Balance',
+      senderFee: 0,
+      burned: 0,
+      tt0: baseTimeToZero,
+      credit: initialBalance,
+      debit: 0,
+      spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
+      chainBalance: initialBalance,
+    }
+  });
+
+  var newRecentTx = new RecentTxDB({
+    name: user,
+    txHistory: {
+      date: date,
+      from: commName,
+      to: user,
+      for: 'Welcome Balance',
+      senderFee: 0,
+      burned: 0,
+      tt0: baseTimeToZero,
+      credit: initialBalance,
+      debit: 0,
+      spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
+      chainBalance: initialBalance,
+    }
+  });
+
+  newTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to DB', err) });
+  newRecentTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to Recent DB', err) });
+  adminUser.save((err) => { if (err) {return handleMongoDBerror('Save Admin to DB', err) }; });
+})();
+
+
 
 // write a first message into db if empty
 
 ChatDB.estimatedDocumentCount().exec((err, res) => {
     if (res < 1) {
-      var firstMsg = new ChatDB({msg: 'Hello World! This is ' + commName + ' Value Banking ... imagine radio tuning noises here ...<br/><br/>', sender: commName, time: Date.now() });
+      var firstMsg = new ChatDB({msg: 'Hello World! This is ' + commName + ' Value Banking ... tune your radio ...<br/><br/>', sender: commName, time: Date.now() });
       firstMsg.save((err) => { if (err) return handleMongoDBerror('Write first chat message to DB', err) });
     }
 })
+
 
 
 //*****************    And so it begins ....    ********************* //

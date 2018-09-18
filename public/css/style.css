@@ -8,8 +8,11 @@ body {font-size: 20px; font-family: 'Prompt', sans-serif;line-height: 1.2em;};
 body, select, input, textarea {color: #333; background: lavender}
 
 
-a {color: #03f;}
-a:hover {color: #69f;}
+a {    color: turquoise;
+    text-decoration: none;
+  }
+
+a:hover {color: paleturquoise;}
 
 /* Custom text-selection colors (remove any text shadows: http://twitter.com/miketaylr/status/12228805301) */
 ::-moz-selection{background: #fcd700; color: #fff; text-shadow: none;}

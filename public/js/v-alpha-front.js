@@ -546,25 +546,20 @@
         this.rows = minRows + rows ;
     });
 
-    // Get the input field
     var input = document.getElementById("textarea-text");
 
-    // Execute a function when the user releases a key on the keyboard
     input.addEventListener("keyup", function(event) {
-      // Cancel the default action, if needed
       event.preventDefault();
-      // Number 13 is the "Enter" key on the keyboard
       if (event.keyCode === 13) {
-        // Trigger the button element with a click
         document.getElementById("textarea-button").click();
       }
     });
 
     $('#textarea-form').submit(function(){
-      var message = $('#textarea-text').val();
+      var message = $('#textarea-text').val().replace(/(\n)+/g,'');
 
-      if (message === '') {
-            // no message was entered, so nothing happens
+      if (message.match(/[a-zA-Z0-9+]/) === null) {
+            // no valid message was entered, so nothing happens
       } else {   // does message include trigger words?
 
         var messageParts = checkForTriggers(message);
