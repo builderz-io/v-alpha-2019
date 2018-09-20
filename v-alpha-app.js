@@ -13,7 +13,7 @@ var daysToZero = 120,  // integer
 
 // set production
 
-var production = true;
+var production = false;
 
 // system init
 
@@ -58,6 +58,10 @@ var userSchema = mongoose.Schema({
   name: String,
   uPhrase: String,
   role: String,
+  stats: {
+    sendVolume: Number,
+    receiveVolume: Number,
+  },
   profile: {
     name: String,
     role: String,
@@ -65,6 +69,7 @@ var userSchema = mongoose.Schema({
     socketID: String,
     joined: Date,
     lastLogin: Date,
+    accessExpires: Date,
   },
   onChain: {
     balance: Number,
@@ -88,24 +93,145 @@ var txSchema = mongoose.Schema({
       chainBalance: Number,
     }]
   });
+var commSchema = mongoose.Schema({
+  commName: String,
+  social: {
+    fb: String,
+    tw: String,
+    web: String,
+  },
+  token: {
+    payout: Number,
+    interval: String,
+    timeToZero: Number,
+    txFee: Number,
+  },
+  stats: {
+    allTimeVolume: Number,
+    valueInCirculation: Number,
+    valueSubstance: Number,
+    verifiedMembers: Number,
+  },
+
+});
 
 var ChatDB = mongoose.model('Message', msgSchema);
 var UserDB = mongoose.model('User', userSchema);
 var TxDB = mongoose.model('Transaction', txSchema);
 var RecentTxDB = mongoose.model('Recent', txSchema);
+var CommunityDB = mongoose.model('Community', commSchema);
 
-production ? false : ChatDB.remove({}, function(err) {
-   console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'ChatDB collection cleared')
-});
-production ? false : UserDB.remove({}, function(err) {
-   console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'UserDB collection cleared')
-});
-production ? false : TxDB.remove({}, function(err) {
-   console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'TxDB collection cleared')
-});
-production ? false : RecentTxDB.remove({}, function(err) {
-   console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'RecentTxDB collection cleared')
-});
+
+if (!(production)) {
+  ChatDB.remove({}, function(err) {
+     console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'ChatDB collection cleared');
+     UserDB.remove({}, function(err) {
+        console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'UserDB collection cleared');
+        TxDB.remove({}, function(err) {
+           console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'TxDB collection cleared');
+           CommunityDB.remove({}, function(err) {
+              console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'CommunityDB collection cleared');
+              RecentTxDB.remove({}, function(err) {
+                 console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + 'RecentTxDB collection cleared');
+                 (function() {
+                   var date = new Date();
+                   var expiryDate = new Date(date).setMonth(new Date(date).getMonth() + 12 * 10);
+
+                   for (i = 0; i < credentials.admin.length; i++) {
+                     var user = credentials.admin[i];
+
+                     var adminUser = new UserDB({
+                       name: user,
+                       uPhrase: credentials.uPhrase[i],
+                       role: 'admin',
+                       stats: {
+                         sendVolume: 0,
+                         receiveVolume: 0,
+                       },
+                       profile: {
+                         joined: date,
+                         lastLogin: date,
+                         accessExpires: expiryDate,
+                         name: user,
+                         role: 'admin',
+                         karma: 10,
+                         socketID: String('offline'),
+                       },
+                       onChain: {
+                         balance: initialBalance,
+                         lastMove: Number(Math.floor(date / 1000)),
+                         timeToZero: baseTimeToZero,
+                       }
+                     });
+
+                     var newTx = new TxDB({
+                       name: user,
+                       txHistory: {
+                         date: date,
+                         from: commName,
+                         to: user,
+                         for: 'Welcome Balance',
+                         senderFee: 0,
+                         burned: 0,
+                         tt0: baseTimeToZero,
+                         credit: initialBalance,
+                         debit: 0,
+                         spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
+                         chainBalance: initialBalance,
+                       }
+                     });
+
+                     var newRecentTx = new RecentTxDB({
+                       name: user,
+                       txHistory: {
+                         date: date,
+                         from: commName,
+                         to: user,
+                         for: 'Welcome Balance',
+                         senderFee: 0,
+                         burned: 0,
+                         tt0: baseTimeToZero,
+                         credit: initialBalance,
+                         debit: 0,
+                         spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
+                         chainBalance: initialBalance,
+                       }
+                     });
+
+                     newTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to DB', err) });
+                     newRecentTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to Recent DB', err) });
+                     adminUser.save((err) => { if (err) {return handleMongoDBerror('Save Admin to DB', err) }; });
+                   }
+
+                   var communityStats = new CommunityDB({
+                     commName: commName,
+                     social: {
+                       fb: 'facebook.com/valueinstrument',
+                       tw: 'twitter.com/valueinstrument',
+                       web: 'valueinstrument.org',
+                     },
+                     token: {
+                       payout: ubi,
+                       interval: 'daily',
+                       timeToZero: daysToZero,
+                       txFee: setTxFee,
+                     },
+                     stats: {
+                       allTimeVolume: 0,
+                       valueInCirculation: 0,
+                       valueSubstance: 0,
+                       verifiedMembers: 0,
+                     },
+                   })
+                   communityStats.save((err) => { if (err) {return handleMongoDBerror('Save Admin to DB', err) }; });
+
+                 })();
+              });
+           });
+        });
+     });
+  });
+}
 
 // set all users to offline on start and add admin-users
 
@@ -115,73 +241,6 @@ UserDB.find().select('profile').exec((err, res) => {
       res.save();
     })
   });
-
-(function() {
-  var date = Date.now();
-
-  for (i = 0; i < credentials.admin.length; i++) {
-    var user = credentials.admin[i];
-
-    var adminUser = new UserDB({
-      name: user,
-      uPhrase: credentials.uPhrase[i],
-      role: 'admin',
-      profile: {
-        joined: date,
-        lastLogin: date,
-        name: user,
-        role: 'admin',
-        karma: 10,
-        socketID: String('offline'),
-      },
-      onChain: {
-        balance: initialBalance,
-        lastMove: Number(Math.floor(date / 1000)),
-        timeToZero: baseTimeToZero,
-      }
-    });
-
-    var newTx = new TxDB({
-      name: user,
-      txHistory: {
-        date: date,
-        from: commName,
-        to: user,
-        for: 'Welcome Balance',
-        senderFee: 0,
-        burned: 0,
-        tt0: baseTimeToZero,
-        credit: initialBalance,
-        debit: 0,
-        spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
-        chainBalance: initialBalance,
-      }
-    });
-
-    var newRecentTx = new RecentTxDB({
-      name: user,
-      txHistory: {
-        date: date,
-        from: commName,
-        to: user,
-        for: 'Welcome Balance',
-        senderFee: 0,
-        burned: 0,
-        tt0: baseTimeToZero,
-        credit: initialBalance,
-        debit: 0,
-        spendable: Math.floor(initialBalance / (1 + setTxFee)) - 1,
-        chainBalance: initialBalance,
-      }
-    });
-
-    newTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to DB', err) });
-    newRecentTx.save((err) => { if (err) return handleMongoDBerror('Save Welcome Balance to Recent DB', err) });
-    adminUser.save((err) => { if (err) {return handleMongoDBerror('Save Admin to DB', err) }; });
-  }
-})();
-
-
 
 // write a first message into db if empty
 
@@ -225,19 +284,29 @@ io.on('connection', function(socket) {
 
       UserDB.findOne({name: forceNiceLookingName(data[1]) }).exec( (err, res) => {
         if (err || res === null) {
-          socket.emit('chat notification', { msg: '<span class="red-text">' + forceNiceLookingName(data[1]) + ' not found', symbol: '&#9673;' });
-          return handleMongoDBerror('Verify User in DB', err);
+          socket.emit('chat notification', { msg: '<span class="red-text">' + forceNiceLookingName(data[1]) + ' not found</span>', symbol: '&#9673;' });
+          return handleMongoDBerror('Find user to verify in DB', err);
         }
         res.profile.role = 'member';
         res.role = 'member';
+        res.profile.accessExpires = new Date().setMonth(new Date().getMonth() + 12);
+
         res.save((err) => {
-          if (err) {return handleMongoDBerror('Verify User in DB', err)};
+          if (err) {return handleMongoDBerror('Verify user in DB', err)};
           updateUserOnlineList();
-          socket.emit('chat notification', { msg: '<span class="green-text">You verified ' + forceNiceLookingName(data[1]), symbol: '&#9673;' });
+          socket.emit('chat notification', { msg: '<span class="green-text">You verified ' + forceNiceLookingName(data[1]) + '</span>', symbol: '&#9673;' });
+
+          // Community Stats
+            CommunityDB.findOne({commName: commName }).select('stats').exec( (err, res) => {
+              res.stats.verifiedMembers += 1;
+              res.save((err) => { if (err) {return handleMongoDBerror('Update Community Stats', err)}; });
+            });
+          // end Stats
+
         });
       });
     } else {
-      socket.emit('chat notification', { msg: '<span class="red-text">You are not authorized to verify members', symbol: '&#9673;' });
+      socket.emit('chat notification', { msg: '<span class="red-text">You are not authorized to verify members</span>', symbol: '&#9673;' });
     }
   })
 
@@ -247,24 +316,41 @@ io.on('connection', function(socket) {
 
       UserDB.findOne({name: forceNiceLookingName(data[1]) }).exec( (err, res) => {
         if (err || res === null) {
-          socket.emit('chat notification', { msg: '<span class="red-text">' + forceNiceLookingName(data[1]) + ' not found', symbol: '&#9673;' });
-          return handleMongoDBerror('Verify User in DB', err);
+          socket.emit('chat notification', { msg: '<span class="red-text">' + forceNiceLookingName(data[1]) + ' not found</span>', symbol: '&#9673;' });
+          return handleMongoDBerror('Find user to set grace in DB', err);
         }
         var name = res.profile.name;
         res.profile.role = 'grace';
         res.role = 'grace';
-        res.profile.name = name + 'graced';
-        res.name = name + 'graced';
+        res.profile.name = name + '-graced';
+        res.name = name + '-graced';
+        res.profile.socketID != 'offline' ? socket.broadcast.to(res.profile.socketID).emit('account graced') : null;
         res.profile.socketID = 'offline';
         res.save((err, res) => {
-          if (err) {return handleMongoDBerror('Verify User in DB', err)};
+          if (err) {return handleMongoDBerror('Set user to grace in DB', err)};
           updateUserOnlineList();
-          socket.emit('chat notification', { msg: '<span class="green-text">You set ' + forceNiceLookingName(data[1]) + ' to "grace"', symbol: '&#9673;' });
-          res.profile.socketID != 'offline' ? socket.broadcast.to(res.profile.socketID).emit('account graced') : null;
+          socket.emit('chat notification', { msg: '<span class="green-text">You set ' + forceNiceLookingName(data[1]) + ' to "grace"</span>', symbol: '&#9673;' });
+
+          TxDB.findOneAndUpdate(
+            { name: name },
+            { name: name + '-graced' },
+            (err) => { if (err) return handleMongoDBerror('Grace User in TxDB', err)}
+          );
+
+          RecentTxDB.findOneAndUpdate(
+            { name: name },
+            { name: name + '-graced' },
+            (err) => { if (err) return handleMongoDBerror('Grace User in TxDB', err)}
+          );
+
+          ChatDB.remove( { sender: { $eq: name } }, (err, data) => {
+            socket.emit('chat notification', { msg: '<span class="green-text">Deleted ' + data.n + ' messages by ' + name + '</span>', symbol: '&#9673;' });
+          } );
+
         });
       });
     } else {
-      socket.emit('chat notification', { msg: '<span class="red-text">You are not authorized to "grace" members', symbol: '&#9673;' });
+      socket.emit('chat notification', { msg: '<span class="red-text">You are not authorized to "grace" members</span>', symbol: '&#9673;' });
     }
   })
 
@@ -295,9 +381,11 @@ io.on('connection', function(socket) {
          };
 
          var filteredNumbers = messageParts.filter(function (item) { return Number(parseInt(item) == item); }),
-                      amount = filteredNumbers.reduce(function(acc, val) { return Number(acc) + Number(val); }, 0);
+                      amount = filteredNumbers.reduce(function(acc, val) { return Number(acc) + Number(val); }, 0),
+                      exp = moment(socket.accessExpires);
 
          return amount <= 0 ? errorTx('Invalid amount') :
+          exp.diff(moment(Date.now()), 'days') < 0 ? errorTx('Your account expired due to inactivity. Please contact the community manager.'):
           recipients.length < 1 ? errorTx('No ' + commName + ' member entered') :
           recipients.indexOf(socket.user) != -1 ? errorTx('You can not send <span class="v">V</span> to yourself') :
          [amount, forceNiceLookingName(socket.user), recipients, reason, timeSecondsUNIX]
@@ -374,13 +462,20 @@ io.on('connection', function(socket) {
 
          var newTotalBalance = burnedSenderBalance - ((txArray[0] + txFee) * txArray[2].length);
 
-         UserDB.findOne({name: txArray[1] }).select('onChain').exec( (err, res) => {
+         UserDB.findOne({name: txArray[1] }).exec( (err, res) => {
+           res.stats.sendVolume += txArray[0];
            res.onChain.balance = newTotalBalance;
            res.onChain.lastMove = txArray[4];
            res.onChain.timeToZero = remainingTimeToZeroSender;
            res.save((err) => {
              if (err) {return handleMongoDBerror('Update Recipient OnChain Data after transaction', err)};
              updateUserAccountData([txArray[1]]);
+               // Community Stats
+                 CommunityDB.findOne({commName: commName }).select('stats').exec( (err, res) => {
+                   res.stats.allTimeVolume += txArray[0];
+                   res.save((err) => { if (err) {return handleMongoDBerror('Update Community Stats', err)}; });
+                 });
+               // end Stats
            });
          });
 
@@ -452,11 +547,14 @@ io.on('connection', function(socket) {
 
               UserDB.findOneAndUpdate(
                 {name: name },
-                { onChain: {
-                  balance: newBalance,
-                  lastMove: txArray[4],
-                  timeToZero: newTimeToZero,
-                }},
+                {
+                  $set: { 'onChain.balance': newBalance,
+                          'onChain.lastMove': txArray[4],
+                          'onChain.timeToZero': newTimeToZero,
+                  },
+                  $inc: { 'stats.receiveVolume': txArray[0],
+                  }
+                },
                 (err) => {
                   if (err) {return handleMongoDBerror('Push Recipient-Tx to Database', err)};
                   updateUserAccountData([name]);
@@ -555,10 +653,41 @@ io.on('connection', function(socket) {
 
   socket.on('about community', function() {
 
-    UserDB.findOne({name: socket.user}).exec(function(err, doc) {
-                  if (err) return handleMongoDBerror('Get community info from DB', err);
-                  socket.emit('about community', doc);
-                  })
+    UserDB.find({ role: { $ne: "grace" }}).sort({'stats.sendVolume':-1}).limit(10).exec((err, res) => {
+      if (err) return handleMongoDBerror('Get top spenders from UserDB', err);
+      console.log(res);
+
+      var topSender = [];
+
+      for (var i=res.length; i-- > 0;) {
+         topSender.push([res[i].name, res[i].stats.sendVolume + ' <span class="v">V</span>']);
+      }
+
+      CommunityDB.findOne({commName: commName}).exec(function(err, res) {
+          if (err) return handleMongoDBerror('Get community info from DB', err);
+
+          var dataArr = [
+                          ['Most Active Senders', ''],
+                          ['&nbsp;', ''],
+                          ['Verified Members', res.stats.verifiedMembers],
+                          ['All Time Volume', res.stats.allTimeVolume + ' <span class="v">V</span>'],
+                          ['Statistics', ''],
+                          ['&nbsp;', ''],
+                          ['Transaction Fee', res.token.txFee * 100 + ' %'],
+                          ['Time To Zero', res.token.timeToZero + ' days'],
+                          ['Interval', res.token.interval],
+                          ['Payout', res.token.payout + ' <span class="v">V</span>'],
+                          ['Token Dynamic', ''],
+                          ['&nbsp;', ''],
+                          ['Website', res.social.web],
+                          ['Twitter', res.social.tw],
+                          ['Facebook', res.social.fb],
+                          ['Social Links', ''],
+                        ];
+
+          socket.emit('about community', topSender.concat(dataArr));
+      });
+    });
   });
 
   socket.on('returning user', function(uPhrase, callback) {
@@ -576,7 +705,7 @@ io.on('connection', function(socket) {
         }
 
         if (doc.uPhrase === uPhrase) {
-
+          socket.accessExpires = doc.profile.accessExpires;
           socket.user = doc.name;
           sendMessageHistory(doc.name, uPhrase, true );
           updateUserAccountData([doc.name]);
@@ -619,15 +748,22 @@ io.on('connection', function(socket) {
             if (userList.indexOf(user) != -1 || user.length > 12 || user.length < 2) {
                 throw new Error('Username taken or void')
             } else {
-                var date = Date.now();
+                var date = new Date();
+                var expiryDate = new Date(date).setMonth(new Date(date).getMonth() + 4);
+                socket.accessExpires = expiryDate;
                 socket.user = user;
                 var newUser = new UserDB({
                   name: user,
                   uPhrase: uPhrase,
                   role: 'network',
+                  stats: {
+                    sendVolume: 0,
+                    receiveVolume: 0,
+                  },
                   profile: {
                     joined: date,
                     lastLogin: date,
+                    accessExpires: expiryDate,
                     name: user,
                     role: 'network',
                     karma: 10,
@@ -716,9 +852,9 @@ io.on('connection', function(socket) {
     RecentTxDB.findOneAndRemove({name: socket.user}).exec();
     TxDB.findOneAndRemove({name: socket.user}).exec();
     UserDB.findOneAndRemove({name: socket.user}).exec((err) => {
-          if (err) {return handleMongoDBerror('Nuke User in DB', err) };
-          updateUserOnlineList();
-        })
+      if (err) {return handleMongoDBerror('Nuke User in DB', err) };
+      updateUserOnlineList();
+    })
 
     delete socket.user;
     socket.emit('nukeme');
@@ -794,7 +930,7 @@ io.on('connection', function(socket) {
             for (i = 0; i < res.length; i++) {
 
               if (res[i].profile.role === 'member' || res[i].profile.role === 'admin') {
-                var verified = ' (verified)' ;
+                var verified = ' <i class="fas fa-star verified-user"></i>' ;
               } else {
                 var verified = '' ;
               }

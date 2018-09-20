@@ -201,6 +201,7 @@ input:focus, button:focus, textarea:focus {
   background: paleturquoise;
   padding: 7px;
   margin-bottom: 6px;
+  border-radius: 6px;
 }
 
 #disconnected-notification {
@@ -265,6 +266,13 @@ input:focus, button:focus, textarea:focus {
   font-size: 0.8em;
   top: -1px;
 position: relative;
+}
+
+.verified-user {
+  font-size: 0.6em;
+bottom: 2px;
+position: relative;
+color: rgb(99, 82, 185);
 }
 
 .fa-times-circle {

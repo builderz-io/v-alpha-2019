@@ -175,7 +175,7 @@
    socket.on('account graced', function() {
 
      Cookies.remove('uPhrase');
-     $('body').html('<div id="system-message">Account has been "graced". Contact the community admin to regain access.');
+     $('body').html('<div id="system-message">Account has been deactivated. Contact the community admin to regain access.');
 
    });
 
@@ -469,8 +469,44 @@
    });
 
    socket.on('about community', function(data){
+
+     var table = document.createElement('TABLE'),
+         tableBody = document.createElement('TBODY'),
+         tableHead = document.createElement('THEAD');
+         table.appendChild(tableHead);
+         table.appendChild(tableBody);
+
+     /* var thCells = ['Stats', 'Data'];
+     var thCellClasses = ['comm-stats-th', 'comm-data-th align-right'];
+     var thRow = tableHead.insertRow(0);
+
+     for (var i=0; i<thCells.length; i++) {
+       th = document.createElement('th');
+       th.innerHTML = thCells[i];
+       th.className = thCellClasses[i];
+       thRow.appendChild(th);
+     } */
+
+     for (var j=data.length; j-- > 0;) {
+
+       if (j >= 0 ) {
+
+         var cells = [ data[j][0], data[j][1] ];
+
+         var cellClasses = ['comm-stats-tr', 'comm-data-tr align-right'];
+
+         var tr = tableBody.insertRow(tableBody.rows.length);
+
+         for (var i=0; i<cells.length; i++) {
+             var td = tr.insertCell(i);
+             td.className = cellClasses[i];
+             td.innerHTML = cells[i];
+         };
+       }
+     };
+
      $('#header-right').html('Community Statistics');
-     $('.page-pipe').html('You joined this community as ' + data.name );
+     $('.page-pipe').html(table);
    });
 
    $('#offline-btn').click(function(){
@@ -523,7 +559,7 @@
 
    });
 
-// Textareas - applied globally on all textareas with the "autoExpand" class
+// Textareas - applied globally on all textareas with the "autoExpand" class - shout out to Yair Even Or
    $(document)
     .one('focus.autoExpand', 'textarea.autoExpand', function(){
         var savedValue = this.value;
