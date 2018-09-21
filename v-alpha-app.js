@@ -11,6 +11,7 @@ var daysToZero = 120,  // integer
     setTxFee = 0.35,  // express in decimal number such as 0.5 for 50%
     commName = 'Value Instrument'; // the community name as String
 
+
 // set production
 
 var production = false;
