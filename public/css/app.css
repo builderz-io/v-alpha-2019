@@ -1,4 +1,4 @@
-#container, #chat-message-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification, #page {
+#container, #textarea-form, #new-user-form, #menu-button, #separator-in-header, #disconnected-notification, #page, #map {
    display: none;
 }
 
@@ -27,6 +27,8 @@ padding: 100px 0 30px 0;
 list-style-type: none;
 
 }
+
+#map { height: 300px }
 
 .message-container {
   margin-bottom: 10px;
@@ -79,17 +81,22 @@ list-style-type: none;
     padding: 0;
 }
 
+.mapboxgl-popup {
+  max-width: 200px;
+}
+
 .form-width {
   max-width: 600px;
   margin: 0px auto;
 }
 
 form input {
-  padding: 7px 16px;
+  padding: 4px 16px;
   width: 63%;
   border-radius: 20px;
   border: none;
   background: lavender;
+  font-family: inherit;
 }
 
 form button {
@@ -117,20 +124,39 @@ form button {
   text-align: center;
 }*/
 
-input:focus, button:focus {
+#add-location {
+    padding: 17px;
+    border: none;
+    background: lightgrey;
+    font-size: 1.1em;
+    float: left;
+    width: 49%;
+}
+
+#search-location {
+    padding: 17px;
+    border: none;
+    background: lightgrey;
+    font-size: 1.1em;
+    float: right;
+    width: 50%;
+
+}
+
+input:focus, button:focus, textarea:focus {
     outline: 0;
 }
 
 #go-offline {
   padding: 14px;
-  font-family: raleway, sans-serif;
+  font-family: inherit;
   background-color: lightgreen;
   border: none;
   }
 
 #cancel-offline {
   padding: 14px;
-  font-family: raleway, sans-serif;
+  font-family: inherit;
   background-color: orangered;
   border: none;
   color: white;
@@ -171,10 +197,11 @@ input:focus, button:focus {
 }
 
 .notification-container {
-  font-size: 0.8em;
+  font-size: 0.9em;
   background: paleturquoise;
   padding: 7px;
   margin-bottom: 6px;
+  border-radius: 6px;
 }
 
 #disconnected-notification {
@@ -227,7 +254,7 @@ input:focus, button:focus {
 }
 
 .fa-bars {
-  padding: 2px 5px 0px 2px;
+  padding: 2px 3px 0px 1px;
     font-size: 1.05em;
 }
 
@@ -239,6 +266,13 @@ input:focus, button:focus {
   font-size: 0.8em;
   top: -1px;
 position: relative;
+}
+
+.verified-user {
+  font-size: 0.6em;
+bottom: 2px;
+position: relative;
+color: rgb(99, 82, 185);
 }
 
 .fa-times-circle {
@@ -273,11 +307,33 @@ margin-bottom: 1px;
 }
 
 .straight-number {
-  font-family: 'Lato', sans-serif;
+  font-family: 'Prompt', sans-serif;
 }
 
 .btn-in-menu {
 
+}
+
+textarea {
+  /* display: block; */
+  box-sizing: padding-box;
+  /* overflow: hidden; */
+  padding: 4px 16px;
+  max-width: 520px;
+  max-height: 150px;
+  font-size: 1em;
+  border-radius: 20px;
+  border: 0px solid #000;
+  background: lavender;
+  font-family: inherit;
+  width: 63%;
+  bottom: 5px;
+  position: absolute;
+}
+
+.send-btn {
+  position: relative;
+  left: 65%;
 }
 
 
@@ -311,8 +367,8 @@ margin-bottom: 1px;
 }
 
 .tx-type {
-  padding-right: 4px;
-  font-size: 0.74em;
+  padding-right: 5px;
+  font-size: 0.6em;
   top: 3px;
   position: relative;
 }
@@ -339,10 +395,9 @@ width: 28px;
 
 }
 .tx-balance {
-  padding-right: 12px;
 }
 .tx-fee {
-
+padding-left: 12px;
 }
 .tx-burned {
 

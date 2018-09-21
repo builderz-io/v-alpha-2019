@@ -12,6 +12,8 @@
        { spendable: 0 }
    ];
 
+   var headerRight = '';
+
    var windowHeight = $( window ).height();  // get device height to set pushy height
    $("#container").height(windowHeight);
 
@@ -30,7 +32,7 @@
                 $('#new-user-form').hide();
                 $('#system-message').hide();
                 $('#container').show();
-                $('#chat-message-form').show();
+                $('#textarea-form').show();
                 $('#menu-button').show();
                 autoScroll();
 
@@ -58,7 +60,7 @@
                $('#new-user-form').hide();
                $('#system-message').hide();
                $('#container').show();
-               $('#chat-message-form').show();
+               $('#textarea-form').show();
                $('#menu-button').show();
                autoScroll();
 
@@ -69,54 +71,6 @@
        $('#user-name').val('');
        return false;
    });
-
-   $('#chat-message-form').submit(function(){
-     var message = $('#message-text').val();
-
-     if (message === '') {
-           // no message was entered, so nothing happens
-     } else {   // does message include trigger words?
-
-       var messageParts = checkForTriggers(message);
-
-       if (!messageParts) { // if message is good and no trigger word was detected, it is not a transaction, therefore just send message into chat
-
-         socket.emit('chat message', message);
-
-       } else {
-
-         if (messageParts.length === 1 && messageParts[0] === 'help') {   // does message include trigger word "help"?
-
-           $('#messages-ul').append('<li class="notification-container"><p>' + '&#9673;' + ' ' + 'Use "send", "pay" or "+" at the start of your message to trigger a transaction. Followed by one or several amounts and then one or several recipients. You can "send 15 to mary" or "send mary 15". In short enter "+15 mary". You can also add numbers by entering "+15 5 20 mary peter". This results in 40 being transferred to each, Mary and Peter. You can specify e.g. "for guitar lessons" at the very end of the message to include a reference. Try it now!' + '</p><p class="time-right">' + moment().format('D MMM YYYY h:mm a') + '</p></li>');
-           autoScroll();
-
-         } else if (messageParts[0] === 'nukeme'){
-           socket.emit('nukeme');
-
-         } else {
-
-             socket.emit('transaction', messageParts);
-         }
-       }
-     }
-
-     $('#message-text').val('');
-     return false;
-   });
-
-   function checkForTriggers(message) {
-     var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme'];
-
-     var messageParts = message.trim().toLowerCase().split(' ');
-
-     if (messageParts[0].charAt(0) === '+') { messageParts.splice(1,0,messageParts[0].slice(1)); messageParts.splice(0,1,messageParts[0].charAt(0)); };
-     if (messageParts[0].substring(0,3) === 'pay') { messageParts.splice(0,0,messageParts[0].substring(0,3)); messageParts.splice(1,1,messageParts[1].substring(3,messageParts[1].length)); };
-     if (messageParts[0].substring(0,4) === 'send' || messageParts[0].substring(0,4) === 'plus' || messageParts[0].substring(0,4) === 'sned' || messageParts[0].substring(0,4) === 'sent' ) { messageParts.splice(0,0,messageParts[0].substring(0,4)); messageParts.splice(1,1,messageParts[1].substring(4,messageParts[1].length)); };
-
-     if (triggers.indexOf(messageParts[0]) != -1) {
-         return messageParts;
-     } else { return false };
-   }
 
    socket.on('set cookies', function(uPhrase) {
      Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
@@ -130,14 +84,11 @@
          $('#messages-ul li:last-child p:first-child span:first-child').html() === data.sender ?
             appendChatMessage(data) : newChatMessage(data);
             autoScroll();
-
-
    });
 
    function newChatMessage(data) {
      $('#messages-ul').append('<li class="message-container"></li>');
      $('#messages-ul li:last-child').html('<p class="message-sender"><span class="strong-weight">' + data.sender + '</span> <span class="time"> ' + moment(data.time).format('D MMM YYYY h:mm a') + '</span></p><p class="message-p">' + data.msg + '</p>');
-
    }
 
    function appendChatMessage(data) {
@@ -171,6 +122,7 @@
    socket.on('name in header', function(name) {
      $('#user-in-header').html(name[0]);
      $('#header-right').html(name[1]);
+     headerRight = name[1];
      $('title').html(name[1] + ' - Value Alpha');
    });
 
@@ -204,7 +156,7 @@
 
    socket.on('disconnect', function() {
 
-       $('#chat-message-form').hide();
+       $('#textarea-form').hide();
        $('#menu-button').hide();
        $('#spendable-in-header').hide();
        $('#disconnected-notification').show();
@@ -220,6 +172,12 @@
 
    });
 
+   socket.on('account graced', function() {
+
+     Cookies.remove('uPhrase');
+     $('body').html('<div id="system-message">Account has been deactivated. Contact the community admin to regain access.');
+
+   });
 
    function accountpie() {  // shout out to Abhisek via adeveloperdiary.com
 
@@ -304,7 +262,7 @@
                  .text(text)
                  .attr({
                      'text-anchor':'middle',
-                     y:y+10
+                     y:y+14
                  })
                  .style({
                      fill:'#41B787',
@@ -419,7 +377,7 @@
            table.appendChild(tableBody);
 
        var thCells = ['&nbsp;', 'Date', '&nbsp;', 'Time', 'Who', 'Reference', '<span class="v">V</span>', '&nbsp;', 'Chain', 'Fee', 'Burn', 'Days'];
-       var thCellClasses = ['tx-type', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit align-right', 'tx-v-sign', 'tx-balance align-right', 'tx-fee align-right', 'tx-burned align-right hide-cell', 'tx-tt0 align-right hide-cell'];
+       var thCellClasses = ['tx-type', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit align-right', 'tx-v-sign', 'tx-balance align-right', 'tx-fee align-right hide-cell', 'tx-burned align-right hide-cell', 'tx-tt0 align-right hide-cell'];
        var thRow = tableHead.insertRow(0);
 
        for (var i=0; i<thCells.length; i++) {
@@ -449,10 +407,9 @@
                           '',
                           tx.burned,
                           Math.floor(tx.tt0/60/60/24),
-
                          ];
 
-             var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-v-sign green-text', 'tx-balance straight-number align-right', 'tx-fee  straight-number align-right', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
+             var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-v-sign green-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right hide-cell', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
 
            } else {
 
@@ -470,7 +427,7 @@
                           Math.floor(tx.tt0/60/60/24),
                         ];
 
-             var cellClasses = ['tx-type red-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number red-text align-right', 'tx-v-sign red-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right', 'tx-burned straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
+             var cellClasses = ['tx-type red-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number red-text align-right', 'tx-v-sign red-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right hide-cell', 'tx-burned straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
 
            }
 
@@ -484,7 +441,7 @@
          }
        };
 
-     $('.page-title').html('Transaction History');
+     $('#header-right').html('Your Transactions');
      $('.page-pipe').html(table);
 
     });
@@ -495,15 +452,68 @@
    });
 
    socket.on('profile', function(data){
-     $('.page-title').html('Your Account Profile');
-     console.log(data);
+     $('#header-right').html('Your Account');
      $('.page-pipe').html('You joined as ' + data.name + '. <br/><br/>Your karma in community participation is ' + data.profile.karma + ' of 10.<br/><br/>Your unique phrase is ' + data.uPhrase + '<br/><br/>Note this phrase down. It can recover your account and log you in on other devices.');
+   });
+
+   $('#location-btn').click(function(){
+     openPage();
+     $('#header-right').html('Offers & Locations');
+     $('.page-pipe').html('<button id="add-location">Add</button><button id="search-location">Search</button>');
+     $('#map').show();
+   });
+
+   $('#about-btn').click(function(){
+     openPage();
+     socket.emit('about community');
+   });
+
+   socket.on('about community', function(data){
+
+     var table = document.createElement('TABLE'),
+         tableBody = document.createElement('TBODY'),
+         tableHead = document.createElement('THEAD');
+         table.appendChild(tableHead);
+         table.appendChild(tableBody);
+
+     /* var thCells = ['Stats', 'Data'];
+     var thCellClasses = ['comm-stats-th', 'comm-data-th align-right'];
+     var thRow = tableHead.insertRow(0);
+
+     for (var i=0; i<thCells.length; i++) {
+       th = document.createElement('th');
+       th.innerHTML = thCells[i];
+       th.className = thCellClasses[i];
+       thRow.appendChild(th);
+     } */
+
+     for (var j=data.length; j-- > 0;) {
+
+       if (j >= 0 ) {
+
+         var cells = [ data[j][0], data[j][1] ];
+
+         var cellClasses = ['comm-stats-tr', 'comm-data-tr align-right'];
+
+         var tr = tableBody.insertRow(tableBody.rows.length);
+
+         for (var i=0; i<cells.length; i++) {
+             var td = tr.insertCell(i);
+             td.className = cellClasses[i];
+             td.innerHTML = cells[i];
+         };
+       }
+     };
+
+     $('#header-right').html('Community Statistics');
+     $('.page-pipe').html(table);
    });
 
    $('#offline-btn').click(function(){
      openPage();
-     $('.page-title').html('Really go offline?');
-     $('.page-pipe').html('<p class="notification-container">Your unique phrase is<br/><br/><span style="red-text">' + Cookies.get("uPhrase") + '</span><br/><br/></p><button id="go-offline">Yes, I noted it down. Go offline now.</button><br/><br/><button id="cancel-offline">Cancel</button>');
+     $('#header-right').html('Go Offline');
+     $('.page-title').html('Please Confirm');
+     $('.page-pipe').html('<p class="notification-container">Your unique phrase is<br/><br/><span style="red-text">' + Cookies.get("uPhrase") + '</span><br/><br/></p><button id="go-offline">Yes, I noted it down</button><br/><br/><button id="cancel-offline">Cancel</button>');
    });
 
    // go offline
@@ -525,13 +535,16 @@
 
    function closePage() {
      $('#page').hide();
-     $('#chat-message-form').show();
+     $('#map').hide();
+     $('#textarea-form').show();
      $('#menu-button').show();
+     $('#header-right').html(headerRight);
+     $('.page-title').html('');
    }
 
    // open page
    function openPage() {
-     $('#chat-message-form').hide();
+     $('#textarea-form').hide();
      $('#menu-button').hide();
      $('#page').show();
    }
@@ -545,6 +558,84 @@
            };
 
    });
+
+// Textareas - applied globally on all textareas with the "autoExpand" class - shout out to Yair Even Or
+   $(document)
+    .one('focus.autoExpand', 'textarea.autoExpand', function(){
+        var savedValue = this.value;
+        this.value = '';
+        this.baseScrollHeight = this.scrollHeight;
+        this.value = savedValue;
+    })
+    .on('input.autoExpand', 'textarea.autoExpand', function(){
+        var minRows = this.getAttribute('data-min-rows')|0, rows;
+        this.rows = minRows;
+        rows = Math.ceil((this.scrollHeight - this.baseScrollHeight) / 16);
+        this.rows = minRows + rows ;
+    });
+
+    var input = document.getElementById("textarea-text");
+
+    input.addEventListener("keyup", function(event) {
+      event.preventDefault();
+      if (event.keyCode === 13) {
+        document.getElementById("textarea-button").click();
+      }
+    });
+
+    $('#textarea-form').submit(function(){
+      var message = $('#textarea-text').val().replace(/(\n)+/g,'');
+
+      if (message.match(/[a-zA-Z0-9+]/) === null) {
+            // no valid message was entered, so nothing happens
+      } else {   // does message include trigger words?
+
+        var messageParts = checkForTriggers(message);
+
+        if (!messageParts) { // if message is good and no trigger word was detected, it is not a transaction, therefore just send message into chat
+
+          socket.emit('chat message', message);
+
+        } else {
+
+          if (messageParts.length === 1 && messageParts[0] === 'help') {   // does message include trigger word "help"?
+
+            $('#messages-ul').append('<li class="notification-container"><p>' + '&#9673;' + ' ' + 'Use "send", "pay" or "+" at the start of your message to trigger a transaction. Followed by one or several amounts and then one or several recipients. You can "send 15 to mary" or "send mary 15". In short enter "+15 mary". You can also add numbers by entering "+15 5 20 mary peter". This results in 40 being transferred to each, Mary and Peter. You can specify e.g. "for guitar lessons" at the very end of the message to include a reference. Try it now!' + '</p><p class="time-right">' + moment().format('D MMM YYYY h:mm a') + '</p></li>');
+            autoScroll();
+
+          } else if (messageParts[0] === 'nukeme'){
+            socket.emit('nukeme');
+
+          } else if (messageParts[0] === 'verify'){
+            socket.emit('verify', [ Cookies.get("uPhrase"), messageParts[1] ] );
+
+          } else if (messageParts[0] === 'grace'){
+            socket.emit('grace', [ Cookies.get("uPhrase"), messageParts[1] ] );
+
+          } else {
+            socket.emit('transaction', messageParts);
+          }
+        }
+      }
+
+      $('#textarea-text').val('');
+      $('#textarea-text').attr('rows','1');
+      return false;
+    });
+
+    function checkForTriggers(message) {
+      var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme', 'verify', 'grace'];
+
+      var messageParts = message.trim().toLowerCase().split(' ');
+
+      if (messageParts[0].charAt(0) === '+') { messageParts.splice(1,0,messageParts[0].slice(1)); messageParts.splice(0,1,messageParts[0].charAt(0)); };
+      if (messageParts[0].substring(0,3) === 'pay') { messageParts.splice(0,0,messageParts[0].substring(0,3)); messageParts.splice(1,1,messageParts[1].substring(3,messageParts[1].length)); };
+      if (messageParts[0].substring(0,4) === 'send' || messageParts[0].substring(0,4) === 'plus' || messageParts[0].substring(0,4) === 'sned' || messageParts[0].substring(0,4) === 'sent' ) { messageParts.splice(0,0,messageParts[0].substring(0,4)); messageParts.splice(1,1,messageParts[1].substring(4,messageParts[1].length)); };
+
+      if (triggers.indexOf(messageParts[0]) != -1) {
+          return messageParts;
+      } else { return false };
+    }
 
 
 }(jQuery));

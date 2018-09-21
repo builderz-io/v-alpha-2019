@@ -47,7 +47,22 @@
 	<link rel="stylesheet" href="/css/style.css" />
 	<link rel="stylesheet" href="/css/app.css" />
 	<link rel="stylesheet" href="/css/pushy.css" />
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato|Raleway">
+	<!-- link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato|Raleway" -->
+	<link href="https://fonts.googleapis.com/css?family=Prompt:200" rel="stylesheet">
+
+	<!-- Map -->
+
+	<!-- link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+   integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+   crossorigin=""/>
+
+	 <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+	    integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+	    crossorigin=""></script -->
+
+
+			<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.js'></script>
+			<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.48.0/mapbox-gl.css' rel='stylesheet' />
 
 	<!-- Lea Verou's prefixfree (http://leaverou.github.io/prefixfree/), lets you use un-prefixed properties in your CSS files -->
 	<!-- script src="assets/js/libs/prefixfree.min.js"></script -->
@@ -101,7 +116,7 @@
 							<li class="pushy-submenu">
 								<button id="account-profile">Community</button>
 								<ul id="profile-list">
-									  <li class="pushy-link"><button id="location-btn" class="btn-in-menu">Locations</button></li>
+									  <li class="pushy-link"><button id="location-btn" class="btn-in-menu">Offers & Locations</button></li>
 										<!-- li class="pushy-link"><button id="event-btn" class="btn-in-menu">Events</button></li>
 										<li class="pushy-link"><button id="job-btn" class="btn-in-menu">Jobs</button></li>
 										<li class="pushy-link"><button id="wao-btn" class="btn-in-menu">Wanted & Offered</button></li>
@@ -113,11 +128,11 @@
 								<button id="account-profile">My Account</button>
 								<ul id="profile-list">
 										<li class="pushy-link"><button id="profile-btn" class="btn-in-menu">Profile</button></li>
-										<li class="pushy-link"><button id="tx-history-btn" class="btn-in-menu">History</button></li>
 										<li class="pushy-link"><a href="http://valueinstrument.org/alpha-help" target="_blank">Get Help</a></li>
 										<li class="pushy-link"><a href="http://valueinstrument.org/contact" target="_blank">Report Bug</a></li>
 										<!-- li class="pushy-link"><button id="trajectory-btn" class="btn-in-menu">Trajectory</button></li -->
 										<li class="pushy-link"><button id="offline-btn" class="btn-in-menu">Go Offline</button></li>
+										<li class="pushy-link"><button id="tx-history-btn" class="btn-in-menu">History</button></li>
 
 								</ul>
 							</li>
@@ -132,6 +147,10 @@
 	<div id="page">
 		<div class="page-content">
 			<div class="page-title"></div>
+			<div class="map-wrapper">
+			  <div id="map">
+				</div>
+			</div>
 			<div class="page-pipe"></div>
 		</div>
 		<i class="far fa-times-circle"></i>
@@ -147,12 +166,12 @@
   <div id="bottom-row" class="">
 		<button id="menu-button" class="button menu-btn"><i class="fas fa-bars"></i></i></button> <!-- &#9776; -->
 
-    <form id="chat-message-form" class="" action="">
-    	<div class="form-width"><input id="message-text" autocomplete="off" placeholder="Message all or send value"/><button id="send-button" class="button send-btn"><i class="fab fa-telegram-plane"></i></button></div>
-    </form>
-
 	  <form id="new-user-form" class="register-form" action="">
 		  <input id="user-name" autocomplete="off" placeholder="Enter your preferred name" autofocus/><button class="button join-btn">Join</button>
+	  </form>
+
+		<form id="textarea-form" class="" action="">
+		  <div class="form-width"><textarea id="textarea-text" class='autoExpand' rows='1' data-min-rows='1'></textarea></div><button id="textarea-button" class="button send-btn"><i class="fab fa-telegram-plane"></i></button>
 	  </form>
   </div>
 
@@ -171,6 +190,55 @@
 <script src="js/Pizzicato.min.js"></script>
 
 <script src="js/v-alpha-front.js"></script>
+
+<script>
+	mapboxgl.accessToken = 'pk.eyJ1IjoidmFsdWVpbnN0cnVtZW50IiwiYSI6ImNqbGw3aWYxejB1aTUzcHMxZ2o4ejVuMm8ifQ.9nokF78xbuqVF09cKCvpIw';
+	var map = new mapboxgl.Map({
+	    container: 'map',
+			center: [13.4050, 52.5200],
+	    zoom: 9,
+	    style: 'mapbox://styles/mapbox/streets-v9'
+	});
+
+	var popup = new mapboxgl.Popup({ offset: 10 })
+			.setText('Philipe Achille accepts Value for help with business plans and financial budgeting.');
+
+	var popup2 = new mapboxgl.Popup({ offset: 10 })
+	    .setText('Anna Blume accepts Value for advice on building social capital.');
+
+	var marker = new mapboxgl.Marker()
+  .setLngLat([13.3325, 52.4564])
+	.setPopup(popup)
+  .addTo(map);
+
+	var marker2 = new mapboxgl.Marker()
+	.setLngLat([13.3140, 52.4901])
+	.setPopup(popup2)
+	.addTo(map);
+
+	var marker3 = false;
+
+	map.on('click', addMarker);
+  function addMarker(e){
+
+		if (marker3 != false) {
+      marker3.remove();
+      marker3 = false;
+
+
+	  } else {
+		  marker3 = new mapboxgl.Marker()
+			.setLngLat(e.lngLat)
+			.setPopup(popup2)
+			.addTo(map);
+
+		}
+  }
+
+
+</script>
+
+
 
 <!-- script src="assets/js/functions.js"></script -->
 <!-- script>$(document).ready(initPage);</script -->

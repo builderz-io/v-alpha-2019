@@ -60,7 +60,7 @@ npm install
 To start the backend
 
 ```
-node vi-alpha.js
+node vi-alpha-app.js
 ```
 
 
@@ -70,6 +70,9 @@ To run the frontend use any browser and access
 localhost:3021
 ```
 
+
+## Testing
+
 Setup test-users across several browsers to send Value between these users.
 
 
@@ -78,7 +81,7 @@ Setup test-users across several browsers to send Value between these users.
 
 Use Ubuntu, Nginx, PM2 or the like to run this on a public server.
 
-Toggle between "false" and "true" in vi-alpha.js to reset (false) or keep (true) database entries when restarting node.
+Toggle between "false" and "true" in vi-alpha-app.js to reset (false) or keep (true) database entries when restarting node.
 
 ```
 var production = true;
