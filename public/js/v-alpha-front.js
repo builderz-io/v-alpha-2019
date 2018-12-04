@@ -1,85 +1,110 @@
-// Value Instrument Alpha | Version 0.2.0 | Apache 2.0 License | https://github.com/valueinstrument/vi-alpha
 
-(function () {
-
-// front-end functionality
+(function ($) {
 
    var socket = io();
 
-   var dataset = [
-       { name: 'elapsed', count: 0 },
-       { name: 'remaining', count: 0 },
-       { spendable: 0 }
-   ];
+   var headerLeft = '';
 
-   var headerRight = '';
+   $('title').html('Value Instrument Alpha');
+   $('#su-header-left').html('Value Instrument');
+   $('#su-header-right').show().html('Welcome');
+   $('.currency-unit').html(str10001);
+   $('#str20010').html(str20010);
+   $('#str20020').html(str20020);
+   $('#str20030').html(str20030);
+   $('#str20040').html(str20040);
+   $('#str20041').html(str20041);
+   $('#first-link').html(str20050);
+   $('#comm-profile').html(str20060);
+   $('#about-btn').html(str20070);
+   $('#pool-btn').html(str20080);
+   $('#contribution-btn').html(str20085);
+   $('#location-btn').html(str20090);
+   $('#account-profile').html(str20100);
+   $('#profile-btn').html(str20110);
+   $('#offline-btn').html(str20120);
+   $('#tx-history-btn').html(str20130);
+   $('#help-link').html(str20140);
+   $('#report-link').html(str20150);
+   $('#signup-button').html(str20160);
+   $('#download-btn').html(str20170);
 
-   var windowHeight = $( window ).height();  // get device height to set pushy height
-   $("#container").height(windowHeight);
 
-   navigator.cookieEnabled ? Cookies.get("uPhrase") ? returningUser() : newUser() : $('#system-message').html('You must have Cookies enabled in your browser for this web app to function.');
+   navigator.cookieEnabled ? Cookies.get("uPhrase") ? returningUser() : newUser() : $('#system-message').html(str10010);
+
+   function newUser() {
+
+      $('#system-message').html(str10030 + '<br/><br/><a class="front-page-help" href="http://valueinstrument.org/alpha-help" target="_blank">' + str10035 + '</a>');
+      $('#new-user-form').show();
+      $('#user-name').attr('placeholder',str10040);
+   }
 
    function returningUser() {
+      $('#system-message').html(str10020);
 
-      socket.emit('returning user', Cookies.get("uPhrase"), function(callback) {
+      var tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      socket.emit('returning user', [Cookies.get("uPhrase"), tz], function(callback) {
         if (callback === 1) {
           Cookies.remove('uPhrase');
-          $('#system-message').html('Please register again. The app has been updated since your last visit.');
+          $('#system-message').html(str10050);
           $('#new-user-form').show();
-          $('#user-name').attr('placeholder','Enter your preferred name');
+          $('#user-name').attr('placeholder',str10040);
 
         } else if (callback === 2) {
-                $('#new-user-form').hide();
-                $('#system-message').hide();
-                $('#container').show();
-                $('#textarea-form').show();
-                $('#menu-button').show();
-                autoScroll();
+                loggedIn();
 
         } else {
-          $('#system-message').html('Your unique phrase (saved as a cookie on your device) does not match. Contact the community admin.');
+          $('#system-message').html(str10060);
 
         }
       });
    }
 
-   function newUser() {
-      $('#new-user-form').show();
-      $('#user-name').attr('placeholder','Enter your preferred name');
-   }
+   $('#new-user-form').submit( function() {
 
-   $('#new-user-form').submit(function(){
+       var entry = sanitize($('#user-name').val()),
+           niceName = forceNiceLookingUserName(sanitize($('#user-name').val())),
+           uPhrase = 'vx' + socket.id.replace('_','a').replace('-','2'),
+           tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-       var entry = $('#user-name').val(),
-           niceName = forceNiceLookingName($('#user-name').val()),
-           uPhrase = 'vx' + socket.id;
-
-       socket.emit('new user', [niceName, uPhrase, entry], function(callback) {
+       socket.emit('new user', [niceName, uPhrase, entry, tz], function(callback) {
          if (callback) {
                Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
-               $('#new-user-form').hide();
-               $('#system-message').hide();
-               $('#container').show();
-               $('#textarea-form').show();
-               $('#menu-button').show();
-               autoScroll();
+               loggedIn();
 
          } else {
-           $('#system-message').html('Please choose another name. This one was taken or void. Must be within 2 to 12 letters.')
+           $('#system-message').html(str10070)
          }
        });
        $('#user-name').val('');
        return false;
    });
 
+   function forceNiceLookingUserName(input) {
+     var string = input.replace(/[^A-Za-z]+/g, '').trim().toLowerCase();
+     return string.charAt(0).toUpperCase() + string.slice(1);
+   }
+
+   function loggedIn() {
+      $('#new-user-form').hide();
+      $('#system-message').hide();
+      $('#signup-screen').hide();
+      $('#signup-header').hide();
+      $('#container').show();
+      $('#textarea-form').show();
+      $('#mn-btn-lb').show();
+      autoScroll();
+   }
+
    socket.on('set cookies', function(uPhrase) {
      Cookies.set("uPhrase", uPhrase, { expires: 365 * 4 });
      returningUser();
    });
 
-   socket.on('chat message', function(data){
+   socket.on('chat message', function(data) {
 
-     $('#messages-ul li:last-child').attr('class') === "notification-container" ?
+     $('#messages-ul li:last-child').attr('class') === "notification-container highlight" ?
          newChatMessage(data) :
          $('#messages-ul li:last-child p:first-child span:first-child').html() === data.sender ?
             appendChatMessage(data) : newChatMessage(data);
@@ -88,14 +113,14 @@
 
    function newChatMessage(data) {
      $('#messages-ul').append('<li class="message-container"></li>');
-     $('#messages-ul li:last-child').html('<p class="message-sender"><span class="strong-weight">' + data.sender + '</span> <span class="time"> ' + moment(data.time).format('D MMM YYYY h:mm a') + '</span></p><p class="message-p">' + data.msg + '</p>');
+     $('#messages-ul li:last-child').html('<p class="message-sender"><span class="strong-weight">' + data.sender + '</span> <span class="time"> ' + toLocal(new Date(data.time)) + '</span></p><p class="message-p">' + data.msg + '</p>');
    }
 
    function appendChatMessage(data) {
      $('#messages-ul li:last-child').append('<p class="message-p">' + data.msg + '</p>');
    }
 
-   socket.on('chat history', function(docs, callback){
+   socket.on('chat history', function(docs, callback) {
 
      $('#messages-ul').html('');
 
@@ -109,25 +134,23 @@
 
     autoScroll();
 
-
    });
 
-   socket.on('chat notification', function(data){
+   socket.on('chat notification', function(data) {
 
-    $('#messages-ul').append('<li class="notification-container"><p>' + data.symbol + ' ' + data.msg + '</p><p class="time-right">' + moment().format('D MMM YYYY h:mm a') + '</p></li>');
+    $('#messages-ul').append('<li class="notification-container highlight"><p>' + data.symbol + ' ' + data.msg + '</p><p class="time-right">' + toLocal(new Date(data.time)) + '</p></li>');
     autoScroll();
 
    });
 
    socket.on('name in header', function(name) {
      $('#user-in-header').html(name[0]);
-     $('#header-right').html(name[1]);
-     headerRight = name[1];
-     $('title').html(name[1] + ' - Value Alpha');
+     $('#header-left').html(name[1]);
+     headerLeft = name[1];
    });
 
    socket.on('transaction received', function() {
-     playSound();
+    // playSound();
    });
 
    /* socket.on('burn info message', function(msg){
@@ -144,22 +167,75 @@
      $('#rt0').html(data.rt0);
      $('#at0').html(data.at0);
 
-     $('#spendable-in-header').html(data.spendable + ' <span class="v">V</span>');
-
-     dataset[0].count = data.rt0;
-     dataset[1].count = data.dt0 - data.rt0;
-     dataset[2].spendable = data.spendable;
+     $('#spendable-in-header').html(data.spendable + ' <span class="currency-unit">' + str10001 + '</span>');
 
      $('#chart').empty();
-     accountpie();
+     svg(data);
+     headerSvg(data);
+
    });
+
+   function svg(data) {
+     // https://openstudio.redhat.com/scratch-made-svg-donut-pie-charts-in-html5/
+     // http://tutorials.jenkov.com/svg/svg-transformation.html
+     // var data = {spendable: 91, rt0: 80, balance: 123, at0: 119, dt0: 120}
+
+     var percent = Math.floor((data.rt0 / data.dt0) * 100);
+
+     var numberDisplay = data.spendable > 19999 ? Math.floor(data.spendable / 1000) + 'k' : data.spendable
+
+     var svg = '<svg width="100%" height="100%" viewBox="0 0 36 36" class="donut">  \
+                  <circle cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke="#000" stroke-width="2.5"></circle>  \
+                  <circle cx="18" cy="18" r="14.3239569771994436" fill="transparent" stroke="#000" stroke-width="1.5"></circle>  \
+                  <circle stroke-dasharray="' + percent + ' ' + (100 - percent) + '" transform ="rotate(-90, 18, 18) translate(0, 36) scale(1, -1)" stroke-dashoffset="-200" cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke="#6352B9" stroke-width="2.5"></circle>  \
+                  <circle stroke-dasharray="' + (percent * 0.9) + ' ' + (100 - percent * 0.9) + '" transform ="rotate(-90, 18, 18) translate(0, 36) scale(1, -1)" stroke-dashoffset="-200" cx="18" cy="18" r="14.3239569771994436" fill="transparent" stroke="#4e3e81" stroke-width="1.5"></circle>  \
+                  <g class="chart-text"> \
+                      <text x="50%" y="51%" class="chart-number"> \
+                        ' + numberDisplay + ' \
+                      </text> \
+                  </g> \
+                </svg>';
+
+     $('#chart').html(svg);
+
+   }
+
+   function headerSvg(data) {
+     // https://openstudio.redhat.com/scratch-made-svg-donut-pie-charts-in-html5/
+     // http://tutorials.jenkov.com/svg/svg-transformation.html
+      // var data = {spendable: 9999, rt0: 80, balance: 123, at0: 119, dt0: 120}
+
+     var percent = Math.floor((data.rt0 / data.dt0) * 100);
+
+     var numberDisplay = data.spendable > 19999 ? Math.floor(data.spendable / 1000) + 'k' : data.spendable
+
+     var svg = '<svg width="55px" height="86%" viewBox="0 0 36 36" class="donut">  \
+                  <circle stroke-dasharray="' + percent + ' ' + (100 - percent) + '" transform ="rotate(-90, 18, 18) translate(0, 36) scale(1, -1)" stroke-dashoffset="-200" cx="18" cy="18" r="15.91549430918954" fill="transparent" stroke="#6352B9" stroke-width="2.7"></circle>  \
+                  <g class="chart-text"> \
+                      <text x="50%" y="56%" class="header-chart-number"> \
+                        ' + numberDisplay + ' \
+                      </text> \
+                  </g> \
+                </svg>';
+
+     $('#header-svg').html(svg);
+
+   }
 
    socket.on('disconnect', function() {
 
+       closePage();
+       $('#site-overlay-2').hide();
+       $('#menu-btn' ).prop( "checked", false );
+       $('#header-svg').off('click');
+       $('#chart').off('click');
        $('#textarea-form').hide();
-       $('#menu-button').hide();
+       $('#mn-btn-lb').hide();
+       $('#select-menu').hide();
        $('#spendable-in-header').hide();
-       $('#disconnected-notification').show();
+       $('#disconnected-notification').show().html('<span class="alert-text">' + str10080 + '</span>').click(function() {
+         location.reload();
+       });
 
        autoScroll();
 
@@ -168,129 +244,16 @@
    socket.on('nukeme', function() {
 
      Cookies.remove('uPhrase');
-     $('body').html('<div id="system-message">Account removed. Reload the page to start over.');
+     $('body').html('<div id="system-message">' + str10090 + '</div>');
 
    });
 
    socket.on('account graced', function() {
 
      Cookies.remove('uPhrase');
-     $('body').html('<div id="system-message">Account has been deactivated. Contact the community admin to regain access.');
+     $('body').html('<div id="system-message">' + str10100 + '</div>');
 
    });
-
-   function accountpie() {  // shout out to Abhisek via adeveloperdiary.com
-
-     var total= dataset[2].spendable;
-
-     var pie=d3.layout.pie()
-             .value(function(d){return d.count})
-             .sort(null);
-
-     var w=240,h=240;
-
-     var outerRadiusArc=w/3;
-     var innerRadiusArc=70;
-     var shadowWidth=5;
-
-     var outerRadiusArcShadow=innerRadiusArc+1;
-     var innerRadiusArcShadow=innerRadiusArc-shadowWidth;
-
-     var color = d3.scale.ordinal()
-      .range(['#6352B9', '#000000', '#B65480', '#D5735A', '#D7D9DA']);
-
-     var svg=d3.select("#chart")
-             .append("svg")
-             .attr({
-                 width:w,
-                 height:h,
-                 class:'shadow'
-             }).append('g')
-             .attr({
-                 transform:'translate('+w/3+','+h/3+')'
-             });
-
-
-     var createChart=function(svg,outerRadius,innerRadius,fillFunction,className){
-
-         var arc=d3.svg.arc()
-                 .innerRadius(outerRadius)
-                 .outerRadius(innerRadius);
-
-         var path=svg.selectAll('.'+className)
-                 .data(pie(dataset))
-                 .enter()
-                 .append('path')
-                 .attr({
-                     class:className,
-                     d:arc,
-                     fill:fillFunction
-                 });
-
-         path.transition()
-                 .duration(0)
-                 .attrTween('d', function(d) {
-                     var interpolate = d3.interpolate({startAngle: 0, endAngle: 0}, d);
-                     return function(t) {
-                         return arc(interpolate(-t));
-                     };
-                 });
-
-         var chart={path:path,arc:arc};
-
-         return chart;
-     };
-
-     var mainChart=createChart(svg,outerRadiusArc,innerRadiusArc,function(d,i){
-         return color(d.data.name);
-     },'path1');
-
-     var shadowChart=createChart(svg,outerRadiusArcShadow,innerRadiusArcShadow,function(d,i){
-         var c=d3.hsl(color(d.data.name));
-         return d3.hsl((c.h+5), (c.s -.07), (c.l -.15));
-     },'path2');
-
-
-     //Add text
-
-     function numberWithCommas(x) {
-         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-     }
-
-     var addText= function (text,y,size) {
-         svg.append('text')
-                 .text(text)
-                 .attr({
-                     'text-anchor':'middle',
-                     y:y+14
-                 })
-                 .style({
-                     fill:'#41B787',
-                     'font-size':size
-                 });
-     };
-
-     var restOfTheData=function(){
-
-         addText(function(){
-             return numberWithCommas(total);
-         },0,'40px');
-
-
-     /*      addText(function(){
-             return "Page View";
-         },25,'10px'); */
-
-     };
-
-     setTimeout(restOfTheData,0);
-
-   };
-
-   function forceNiceLookingName(input) {
-     var string = input.replace(/[^A-Za-z]+/g, '').trim().toLowerCase();
-     return string.charAt(0).toUpperCase() + string.slice(1);
-   }
 
    function autoScroll() {
      $('#container').animate({scrollTop: $('#container').get(0).scrollHeight}, 500);
@@ -298,177 +261,146 @@
 
    function playSound() { // this is a beautiful sound composition by philipeachille
 
-      var sineWave1 = new Pizzicato.Sound({
-          source: 'wave',
-          options: { type: 'sine', frequency: 880, volume: 0.27 }
-      });
-      var sineWave2 = new Pizzicato.Sound({
-          source: 'wave',
-          options: { type: 'sine', frequency: 440, volume: 0.9 }
-      });
-      var sineWave3 = new Pizzicato.Sound({
-          source: 'wave',
-          options: { type: 'sine', frequency: 659.255, volume: 0.62 }
-      });
+     if ($('script[src="js/pizzicato.min.js"]').length == 0) {
 
-      var reverb = new Pizzicato.Effects.Reverb({
-          time: 0.6,
-          decay: 1.2,
-          reverse: false,
-          mix: 0.9
-      });
-      var tremolo = new Pizzicato.Effects.Tremolo({
-          speed: 7,
-          depth: 0.8,
-          mix: 0.3
-      });
-      sineWave1.attack = 0.3;
-      sineWave2.attack = 0.3;
-      sineWave1.release = 2;
-      sineWave2.release = 2;
+     var load = (function() {
+        // shout out to https://davidwalsh.name/javascript-loader
+        function _load(tag) {
+          return function(url) {
+            // This promise will be used by Promise.all to determine success or failure
+            return new Promise(function(resolve, reject) {
+              var element = document.createElement(tag);
+              var parent = 'body';
+              var attr = 'src';
 
-      var group = new Pizzicato.Group([sineWave1, sineWave2, sineWave3]);
+              // Important success and error for the promise
+              element.onload = function() {
+                resolve(url);
+              };
+              element.onerror = function() {
+                reject(url);
+              };
 
-      group.addEffect(reverb);
-      group.addEffect(tremolo);
+              // Need to set different attributes depending on tag type
+              switch(tag) {
+                case 'script':
+                  element.async = true;
+                  break;
+                case 'link':
+                  element.type = 'text/css';
+                  element.rel = 'stylesheet';
+                  attr = 'href';
+                  parent = 'head';
+              }
 
-      group.play();
+              // Inject into document to kick off loading
+              element[attr] = url;
+              document[parent].appendChild(element);
+            });
+          };
+        }
 
-      setTimeout(function() { group.stop() }, 100);
+        return {
+          css: _load('link'),
+          js: _load('script'),
+          img: _load('img')
+        }
+      })();
+
+      // Usage:  Load different file types with one callback
+      Promise.all([
+          load.js('js/pizzicato.min.js'),
+
+        ]).then(function() {
+
+          var sineWave1 = new Pizzicato.Sound({
+              source: 'wave',
+              options: { type: 'sine', frequency: 880, volume: 0.27 }
+          });
+          var sineWave2 = new Pizzicato.Sound({
+              source: 'wave',
+              options: { type: 'sine', frequency: 440, volume: 0.9 }
+          });
+          var sineWave3 = new Pizzicato.Sound({
+              source: 'wave',
+              options: { type: 'sine', frequency: 659.255, volume: 0.62 }
+          });
+
+          var reverb = new Pizzicato.Effects.Reverb({
+              time: 0.6,
+              decay: 1.2,
+              reverse: false,
+              mix: 0.9
+          });
+          var tremolo = new Pizzicato.Effects.Tremolo({
+              speed: 7,
+              depth: 0.8,
+              mix: 0.3
+          });
+          sineWave1.attack = 0.3;
+          sineWave2.attack = 0.3;
+          sineWave1.release = 2;
+          sineWave2.release = 2;
+
+          var group = new Pizzicato.Group([sineWave1, sineWave2, sineWave3]);
+
+          group.addEffect(reverb);
+          group.addEffect(tremolo);
+
+          group.play();
+
+          setTimeout(function() { group.stop() }, 100);
+
+
+        }).catch(function() {
+          console.log('Could not play sound');
+        });
+
+      }
 
     }
 
-// Pages
+// Core Pages
 
-   $('#tx-history-btn').click(function(){
+   $('#tx-history-btn').click( function() {
      openPage();
      socket.emit('tx history');
-    });
+   });
 
-   socket.on('tx history', function(data){
+   $('#download-btn').click( function() {
+     socket.emit('download tx history');
+   });
 
-      /*  data = {
-      date: ,
-      from: ,
-      to: ,
-      for: ,
-      senderFee: ,
-      burned: ,
-      tt0: ,
-      credit: ,
-      debit: ,
-      spendable: ,
-      chainBalance: ,
-      }
+   $('#header-svg').on('click', function() {
+      openPage();
+      socket.emit('tx history');
+   });
 
-      [{"_id":"5b79eb0abdf91c45bd172388",
-      "name":"Peter",
-      "txHistory":[
-        {"_id":"5b79eb0abdf91c45bd172389","date":"2018-08-19T22:11:22.852Z","from":"Value","to":"Peter","for":"Welcome Balance","senderFee":0,"burned":0,"tt0":200,"credit":100,"debit":0,"spendable":66,"chainBalance":100},
-        {"_id":"5b79eb0fbdf91c45bd17238c","date":"2018-08-19T22:11:27.533Z","from":"Value","to":"Peter","for":"Basic Income","senderFee":0,"burned":2,"tt0":195,"credit":10,"debit":0,"spendable":72,"chainBalance":108},
-        {"_id":"5b79eb19bdf91c45bd17238d","date":"2018-08-19T22:11:37.537Z","from":"Value","to":"Peter","for":"Basic Income","senderFee":0,"burned":5,"tt0":185,"credit":10,"debit":0,"spendable":75,"chainBalance":113}
-        ]
-      }] */
+   $('#chart').on('click', function() {
+       openPage();
+       socket.emit('tx history');
+   });
 
-       var table = document.createElement('TABLE'),
-           tableBody = document.createElement('TBODY'),
-           tableHead = document.createElement('THEAD');
-           table.appendChild(tableHead);
-           table.appendChild(tableBody);
+   socket.on('tx history', function(data) {
 
-       var thCells = ['&nbsp;', 'Date', '&nbsp;', 'Time', 'Who', 'Reference', '<span class="v">V</span>', '&nbsp;', 'Chain', 'Fee', 'Burn', 'Days'];
-       var thCellClasses = ['tx-type', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit align-right', 'tx-v-sign', 'tx-balance align-right', 'tx-fee align-right hide-cell', 'tx-burned align-right hide-cell', 'tx-tt0 align-right hide-cell'];
-       var thRow = tableHead.insertRow(0);
-
-       for (var i=0; i<thCells.length; i++) {
-         th = document.createElement('th');
-         th.innerHTML = thCells[i];
-         th.className = thCellClasses[i];
-         thRow.appendChild(th);
-       }
-
-       for (var j=data.txHistory.length; j-- > 0;) {
-
-         if (j >= 0 ) {
-
-           var tx = data.txHistory[j];
-
-           if (tx.senderFee === 0) {
-
-             var cells = ['&#9673;',
-                          moment(tx.date).format('D MMM'),
-                          moment(tx.date).format('YY'),
-                          moment(tx.date).format('hh:mm a'),
-                          tx.from,
-                          tx.for.charAt(0).toUpperCase() + tx.for.slice(1),
-                          tx.credit,
-                          '<span class="v">V</span>',
-                          tx.chainBalance,
-                          '',
-                          tx.burned,
-                          Math.floor(tx.tt0/60/60/24),
-                         ];
-
-             var cellClasses = ['tx-type green-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number green-text align-right', 'tx-v-sign green-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right hide-cell', 'tx-burned  straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
-
-           } else {
-
-             var cells = ['&#9673;',
-                          moment(tx.date).format('D MMM'),
-                          moment(tx.date).format('YY'),
-                          moment(tx.date).format('hh:mm a'),
-                          tx.to,
-                          tx.for.charAt(0).toUpperCase() + tx.for.slice(1),
-                          (tx.debit * -1),
-                          '<span class="v">V</span>',
-                          tx.chainBalance,
-                          tx.senderFee,
-                          tx.burned,
-                          Math.floor(tx.tt0/60/60/24),
-                        ];
-
-             var cellClasses = ['tx-type red-text', 'tx-date', 'tx-date-y hide-cell', 'tx-date-hh hide-cell', 'tx-from', 'tx-for', 'tx-credit straight-number red-text align-right', 'tx-v-sign red-text', 'tx-balance straight-number align-right', 'tx-fee straight-number align-right hide-cell', 'tx-burned straight-number align-right hide-cell', 'tx-tt0 straight-number align-right hide-cell'];
-
-           }
-
-           var tr = tableBody.insertRow(tableBody.rows.length);
-
-           for (var i=0; i<cells.length; i++) {
-               var td = tr.insertCell(i);
-               td.className = cellClasses[i];
-               td.innerHTML = cells[i];
-           };
-         }
-       };
-
-     $('#header-right').html('Your Transactions');
-     $('.page-pipe').html(table);
+     $('#header-left').html(strTxPg110);
+     $('.page-pipe').html(txHistoryTable(data));
 
     });
 
-   $('#profile-btn').click(function(){
+   socket.on('download tx history', function(data) {
+      downloadCSV({ data: data[0].txHistory,
+                    filename: 'Transaction-History-' + data[0].name + '-' + toLocal(Date.now()).replace(/\s/g, '-') + '.csv',
+                  });
+
+   });
+
+   $('#profile-btn').click( function() {
      openPage();
      socket.emit('profile');
    });
 
-   socket.on('profile', function(data){
-     $('#header-right').html('Your Account');
-     $('.page-pipe').html('You joined as ' + data.name + '. <br/><br/>Your karma in community participation is ' + data.profile.karma + ' of 10.<br/><br/>Your unique phrase is ' + data.uPhrase + '<br/><br/>Note this phrase down. It can recover your account and log you in on other devices.');
-   });
-
-   $('#location-btn').click(function(){
-     openPage();
-     $('#header-right').html('Offers & Locations');
-     $('.page-pipe').html('<button id="add-location">Add</button><button id="search-location">Search</button>');
-     $('#map').show();
-   });
-
-   $('#about-btn').click(function(){
-     openPage();
-     socket.emit('about community');
-   });
-
-   socket.on('about community', function(data){
+   socket.on('profile', function(data) {
 
      var table = document.createElement('TABLE'),
          tableBody = document.createElement('TBODY'),
@@ -476,16 +408,90 @@
          table.appendChild(tableHead);
          table.appendChild(tableBody);
 
-     /* var thCells = ['Stats', 'Data'];
-     var thCellClasses = ['comm-stats-th', 'comm-data-th align-right'];
-     var thRow = tableHead.insertRow(0);
+     for (var j=data.length; j-- > 0;) {
 
-     for (var i=0; i<thCells.length; i++) {
-       th = document.createElement('th');
-       th.innerHTML = thCells[i];
-       th.className = thCellClasses[i];
-       thRow.appendChild(th);
-     } */
+       if (j >= 0 ) {
+
+         var cells = [ data[j][0], data[j][1] ];
+
+         var cellClasses = ['profile-tr', 'profile-data-tr align-right'];
+
+         var tr = tableBody.insertRow(tableBody.rows.length);
+
+         for (var i=0; i<cells.length; i++) {
+             var td = tr.insertCell(i);
+             td.className = cellClasses[i];
+             td.innerHTML = cells[i];
+         };
+       }
+     };
+
+     $('#header-left').html('Your Account');
+     $('.page-pipe').html(table);
+
+     $('.delete-loc').click( function(e) {
+
+       var id = e.target.id;
+
+         socket.emit('delete location', id , function(callback) {
+           if (callback) {
+              $('#' + id).replaceWith(strPfPg110);
+
+           } else {
+             $('#' + id).replaceWith(strPfPg120);
+           }
+         });
+
+         return false;
+     });
+
+     $('.disable-pool').click( function(e) {
+
+       var id = e.target.id;
+
+         socket.emit('disable pool', id , function(callback) {
+           if (callback) {
+              $('#' + id).replaceWith(strPfPg110);
+
+           } else {
+             $('#' + id).replaceWith(strPfPg120);
+           }
+         });
+
+         return false;
+     });
+
+     $('.disable-qc').click( function(e) {
+
+       var id = e.target.id;
+
+         socket.emit('disable contribution', id , function(callback) {
+           if (callback) {
+              $('#' + id).replaceWith(strPfPg110);
+
+           } else {
+             $('#' + id).replaceWith(strPfPg120);
+           }
+         });
+
+         return false;
+     });
+
+
+   });
+
+   $('#about-btn').click( function() {
+     openPage();
+     socket.emit('about community');
+   });
+
+   socket.on('about community', function(data) {
+
+     var table = document.createElement('TABLE'),
+         tableBody = document.createElement('TBODY'),
+         tableHead = document.createElement('THEAD');
+         table.appendChild(tableHead);
+         table.appendChild(tableBody);
 
      for (var j=data.length; j-- > 0;) {
 
@@ -505,53 +511,50 @@
        }
      };
 
-     $('#header-right').html('Community Statistics');
+     $('#header-left').html(strCmPg110);
      $('.page-pipe').html(table);
    });
 
-   $('#offline-btn').click(function(){
+   $('#offline-btn').click( function() {
      openPage();
-     $('#header-right').html('Go Offline');
-     $('.page-title').html('Please Confirm');
-     $('.page-pipe').html('<p class="notification-container">Your unique phrase is<br/><br/><span style="red-text">' + Cookies.get("uPhrase") + '</span><br/><br/></p><button id="go-offline">Yes, I noted it down</button><br/><br/><button id="cancel-offline">Cancel</button>');
+     $('#header-left').html(strOfPg110);
+     $('.page-title').html(strOfPg120);
+     $('.page-pipe').html('<p class="notification-container highlight">' + strOfPg130 + '<br/><br/><span style="alert-text alert-bgrd">' + Cookies.get("uPhrase") + '</span><br/><br/></p><button id="go-offline">' + strOfPg140 + '</button><br/><br/><button id="cancel-offline">' + strOfPg150 + '</button>');
    });
 
    // go offline
-   $(document).on('click', '#go-offline', function(){
+   $(document).on('click', '#go-offline', function() {
      socket.disconnect();
-     $('body').html('<div id="system-message">You\'ve gone offline. Reload the page to start over.');
+     $('body').html('<div id="system-message">' + strOfPg160 + '</div>');
      Cookies.remove('uPhrase');
    });
 
-
    // close page
-   $('.fa-times-circle').click(function(){
+   $('.fa-times-circle').click( function() {
 	   closePage()
 	 });
 
-   $(document).on('click', '#cancel-offline', function(){
+   $(document).on('click', '#cancel-offline', function() {
      closePage()
+   });
+
+   $('#top-right-close').on('click', function() {
+     closePage();
    });
 
    function closePage() {
      $('#page').hide();
-     $('#map').hide();
+     $('#site-overlay').hide();
+     $('#site-overlay-2').hide();
      $('#textarea-form').show();
-     $('#menu-button').show();
-     $('#header-right').html(headerRight);
+     $('#mn-btn-lb').show();
+     $('#header-left').html(headerLeft);
      $('.page-title').html('');
+     $('.page-pipe').html('');
    }
-
-   // open page
-   function openPage() {
-     $('#textarea-form').hide();
-     $('#menu-button').hide();
-     $('#page').show();
-   }
-
 
 // disallow back button
-   $(document).ready(function() {
+   $(document).ready( function() {
            window.history.pushState(null, "", window.location.href);
            window.onpopstate = function() {
                window.history.pushState(null, "", window.location.href);
@@ -561,13 +564,13 @@
 
 // Textareas - applied globally on all textareas with the "autoExpand" class - shout out to Yair Even Or
    $(document)
-    .one('focus.autoExpand', 'textarea.autoExpand', function(){
+    .one('focus.autoExpand', 'textarea.autoExpand', function() {
         var savedValue = this.value;
         this.value = '';
         this.baseScrollHeight = this.scrollHeight;
         this.value = savedValue;
     })
-    .on('input.autoExpand', 'textarea.autoExpand', function(){
+    .on('input.autoExpand', 'textarea.autoExpand', function() {
         var minRows = this.getAttribute('data-min-rows')|0, rows;
         this.rows = minRows;
         rows = Math.ceil((this.scrollHeight - this.baseScrollHeight) / 16);
@@ -583,8 +586,8 @@
       }
     });
 
-    $('#textarea-form').submit(function(){
-      var message = $('#textarea-text').val().replace(/(\n)+/g,'');
+    $('#textarea-form').submit( function() {
+      var message = sanitize($('#textarea-text').val());
 
       if (message.match(/[a-zA-Z0-9+]/) === null) {
             // no valid message was entered, so nothing happens
@@ -598,9 +601,9 @@
 
         } else {
 
-          if (messageParts.length === 1 && messageParts[0] === 'help') {   // does message include trigger word "help"?
+          if (messageParts.length === 1 && commandsHlp.indexOf(messageParts[0]) != -1) {   // does message include trigger word "help"?
 
-            $('#messages-ul').append('<li class="notification-container"><p>' + '&#9673;' + ' ' + 'Use "send", "pay" or "+" at the start of your message to trigger a transaction. Followed by one or several amounts and then one or several recipients. You can "send 15 to mary" or "send mary 15". In short enter "+15 mary". You can also add numbers by entering "+15 5 20 mary peter". This results in 40 being transferred to each, Mary and Peter. You can specify e.g. "for guitar lessons" at the very end of the message to include a reference. Try it now!' + '</p><p class="time-right">' + moment().format('D MMM YYYY h:mm a') + '</p></li>');
+            $('#messages-ul').append('<li class="notification-container highlight"><p>' + '&#9673;' + ' ' + str10110 + '</p></li>');
             autoScroll();
 
           } else if (messageParts[0] === 'nukeme'){
@@ -608,6 +611,9 @@
 
           } else if (messageParts[0] === 'verify'){
             socket.emit('verify', [ Cookies.get("uPhrase"), messageParts[1] ] );
+
+          } else if (messageParts[0] === 'makeadmin'){
+            socket.emit('makeadmin', [ Cookies.get("uPhrase"), messageParts[1] ] );
 
           } else if (messageParts[0] === 'grace'){
             socket.emit('grace', [ Cookies.get("uPhrase"), messageParts[1] ] );
@@ -624,17 +630,134 @@
     });
 
     function checkForTriggers(message) {
-      var triggers = ['+', 'plus', 'pay', 'send', 'sent', 'sned', 'help', 'nukeme', 'verify', 'grace'];
+      var triggers = commands.concat(commandsHlp, commandsEN, commandsDE, commandsKO);
 
-      var messageParts = message.trim().toLowerCase().split(' ');
+      var messageParts = message.trim().split(' ');
 
-      if (messageParts[0].charAt(0) === '+') { messageParts.splice(1,0,messageParts[0].slice(1)); messageParts.splice(0,1,messageParts[0].charAt(0)); };
+      // in case user misses a blank, insert it // TODO: simplify and rework this functionality, also to work for all languages
+
+      if (messageParts[0].charAt(0) === '+' || messageParts[0].charAt(0) === '-') { messageParts.splice(1,0,messageParts[0].slice(1)); messageParts.splice(0,1,messageParts[0].charAt(0)); };
       if (messageParts[0].substring(0,3) === 'pay') { messageParts.splice(0,0,messageParts[0].substring(0,3)); messageParts.splice(1,1,messageParts[1].substring(3,messageParts[1].length)); };
+      if (messageParts[0].substring(0,7) === 'request') { messageParts.splice(0,0,messageParts[0].substring(0,7)); messageParts.splice(1,1,messageParts[1].substring(7,messageParts[1].length)); };
       if (messageParts[0].substring(0,4) === 'send' || messageParts[0].substring(0,4) === 'plus' || messageParts[0].substring(0,4) === 'sned' || messageParts[0].substring(0,4) === 'sent' ) { messageParts.splice(0,0,messageParts[0].substring(0,4)); messageParts.splice(1,1,messageParts[1].substring(4,messageParts[1].length)); };
 
-      if (triggers.indexOf(messageParts[0]) != -1) {
+      if (triggers.indexOf(messageParts[0].toLowerCase()) != -1) {
+          messageParts[0] = messageParts[0].toLowerCase();
           return messageParts;
       } else { return false };
+    }
+
+// Menu/Submenus - shoutout to https://github.com/christophery/pushy/
+
+  var siteOverlay = $('#site-overlay'), //site overlay
+        siteOverlay2 = $('#site-overlay-2'), //site overlay 2
+        submenuClass = '.pushy-submenu',
+        submenuOpenClass = 'pushy-submenu-open',
+        submenuClosedClass = 'pushy-submenu-closed',
+        submenu = $(submenuClass);
+
+    function toggleSubmenu(){
+      //hide submenu by default
+      $(submenuClass).addClass(submenuClosedClass);
+
+      $(submenuClass).on('click', function() {
+            var selected = $(this);
+
+            if( selected.hasClass(submenuClosedClass) ) {
+                //hide opened submenus
+                $(submenuClass).addClass(submenuClosedClass).removeClass(submenuOpenClass);
+                //show submenu
+                selected.removeClass(submenuClosedClass).addClass(submenuOpenClass);
+            }else{
+                //hide submenu
+                selected.addClass(submenuClosedClass).removeClass(submenuOpenClass);
+            }
+        });
+    }
+
+    //checks if 3d transforms are supported removing the modernizr dependency
+      var cssTransforms3d = (function csstransforms3d(){
+        var el = document.createElement('p'),
+        supported = false,
+        transforms = {
+            'webkitTransform':'-webkit-transform',
+            'OTransform':'-o-transform',
+            'msTransform':'-ms-transform',
+            'MozTransform':'-moz-transform',
+            'transform':'transform'
+        };
+
+        if(document.body !== null) {
+          // Add it to the body to get the computed style
+          document.body.insertBefore(el, null);
+
+          for(var t in transforms){
+              if( el.style[t] !== undefined ){
+                  el.style[t] = 'translate3d(1px,1px,1px)';
+                  supported = window.getComputedStyle(el).getPropertyValue(transforms[t]);
+              }
+          }
+
+          document.body.removeChild(el);
+
+          return (supported !== undefined && supported.length > 0 && supported !== "none");
+        }else{
+          return false;
+        }
+      })();
+
+      if (cssTransforms3d) {
+        //toggle submenu
+        toggleSubmenu();
+
+        //close menu when clicking site overlay
+        siteOverlay.on('click', function() {
+          $( "#menu-btn" ).prop( "checked", false )
+          toggleOverlay()
+        });
+        siteOverlay2.on('click', function() {
+          $( "#menu-btn" ).prop( "checked", false );
+          toggleOverlay()
+        });
+
+      } else {
+        //add css class to body
+        body.addClass('no-csstransforms3d');
+
+        //fixes IE scrollbar issue
+        // container.css({"overflow-x": "hidden"});
+
+        //keep track of menu state (open/close)
+        // var opened = false;
+
+        //toggle submenu
+        toggleSubmenu();
+
+        //close menu when clicking site overlay
+        siteOverlay.on('click', function() {
+          $( "#menu-btn" ).prop( "checked", false )
+          toggleOverlay()
+        });
+        siteOverlay2.on('click', function() {
+          $( "#menu-btn" ).prop( "checked", false );
+          toggleOverlay()
+        });
+    }
+
+    $(document).ready(function () {
+      $( "#menu-btn" ).change(function () {
+         toggleOverlay()
+      });
+    });
+
+    function toggleOverlay() {
+      if ( $('#site-overlay').is(":visible") ) {
+        $('#site-overlay').fadeToggle();
+        $('#site-overlay-2').hide();
+      } else {
+        $('#site-overlay').delay( 300 ).fadeToggle();
+        $('#site-overlay-2').delay( 300 ).fadeToggle();
+      }
     }
 
 
