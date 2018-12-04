@@ -37,6 +37,12 @@ Windows
 https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 ```
 
+You need node.js installed and running.
+
+```
+https://nodejs.org/en/
+```
+
 ### Installing
 
 Open a Terminal window and run the following commands.
