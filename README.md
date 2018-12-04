@@ -1,12 +1,14 @@
 # Value Instrument Alpha
 
-This repository includes an implementation of the Value Instrument's four principles in monetary design, that aim to stimulate economic activity in communities. This alpha version is coded with blockchain technology in mind, yet it does not run on or connect to any blockchain in its current state.
+This repository includes an implementation of the Value Instrument's four principles for monetary design, that aim to stimulate economic activity in communities. This alpha version is coded with blockchain technology in mind, yet it does not run on or connect to any blockchain in its current state.
 
 Installing and running this alpha will give you an online-banking-web-app with a chat-like user interface.
 
+You will be able to experience a demurrage-token first hand!
+
 ### Principles presented in this alpha
 
-* You get Value on a regular basis.
+* You get a payout on a regular basis.
 * You burn the amounts received, if not used within their lifetime.
 * Your received amounts always have fully renewed lifetime.
 * You pay a transaction fee, to avoid ping-pong transfers for regaining new lifetime.
@@ -37,7 +39,7 @@ https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 
 ### Installing
 
-Open a Terminal window and run the follwing commands.
+Open a Terminal window and run the following commands.
 
 Clone this repository into a local folder. A new folder will be created.
 
@@ -57,10 +59,31 @@ Install dependencies
 npm install
 ```
 
+Rename systemInit-example.js to systemInit.js and setup your preferred settings. The minimum you should set are the following details, the other settings are decent presets and can be explored later.
+
+```
+exports.admins = [
+
+                 {
+                     name: 'YourName',  
+                     uPhrase: 'vxAnyPassPhrase'
+                 },
+
+               ];
+
+ exports.communityGovernance = {
+                                   commName: 'Your Community',
+                                   commuPhrase: 'vxAnyOtherPassPhrase',  
+                               }
+
+
+```
+
+
 To start the backend
 
 ```
-node vi-alpha-app.js
+node v-alpha-app.js
 ```
 
 
@@ -76,15 +99,42 @@ localhost:3021
 Setup test-users across several browsers to send Value between these users.
 
 
+## Setting the language
+
+Set the language codes in systemInit.js and index.html:
+
+- 'en-US' for English
+- 'de-DE' for German
+
+In systemInit.js:
+
+```
+exports.language = 'en-US'
+
+```
+
+In index.html:
+
+```
+src="lang/en-US.js"
+```
+
+and
+
+```
+var appLang="en-US.js"
+
+```
 
 ## Deployment
 
 Use Ubuntu, Nginx, PM2 or the like to run this on a public server.
 
-Toggle between "false" and "true" in vi-alpha-app.js to reset (false) or keep (true) database entries when restarting node.
+In systemInit.js set "production" from false to true, once you wish to run the install without dropping the database on system restarts
 
 ```
-var production = true;
+exports.production = true
+
 ```
 
 ## Built With
@@ -92,11 +142,8 @@ var production = true;
 * node.js
 * express.js
 * socket.io
-* d3.js
 * moment.js
 * MongoDB / mongoose.js
-* [Pushy Layout](https://chrisyee.ca/pushy/)
-* [html5 Boilerplate](https://html5boilerplate.com/)
 
 
 ## Authors
@@ -110,4 +157,4 @@ This project is licensed under the Apache 2.0 license - see the [LICENSE.md](LIC
 
 ## Acknowledgements
 
-We are grateful to the many developers building the tools and applications that make it possible to publish this Alpha Version.
+We are grateful to the many developers building the tools and applications that make it possible to publish this Alpha Version of the Value Instrument.

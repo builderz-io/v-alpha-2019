@@ -1,3 +1,4 @@
 node_modules
 .DS_Store
-admin-credentials.js
+systemInit.js
+ko-KR.js
