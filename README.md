@@ -71,7 +71,7 @@ Rename systemInit-example.js to systemInit.js and setup your preferred settings.
 exports.admins = [
 
                  {
-                     name: 'YourName',  
+                     name: 'Yourname',  // MUST be one word
                      uPhrase: 'vxAnyPassPhrase'
                  },
 
