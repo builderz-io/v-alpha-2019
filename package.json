@@ -1,8 +1,8 @@
 {
   "name": "Value-Instrument-Alpha",
-  "version": "0.3.0",
+  "version": "0.3.5",
   "description": "Value Instrument Alpha",
-  "main": "vi-alpha-app.js",
+  "main": "v-alpha-app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

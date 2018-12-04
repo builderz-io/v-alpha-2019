@@ -150,6 +150,8 @@ exports.production = true
 * socket.io
 * moment.js
 * MongoDB / mongoose.js
+* [Pushy Layout](https://chrisyee.ca/pushy/)
+* [html5 Boilerplate](https://html5boilerplate.com/)
 
 
 ## Authors
