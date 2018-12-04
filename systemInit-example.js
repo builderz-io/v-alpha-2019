@@ -12,12 +12,12 @@ exports.language = 'en-US';  // sets the app-language // Type String // e.g. en 
 exports.admins = [  // add objects for each admin
 
                  {
-                     name: 'AdminName',  // the community admin name // MUST be in one word // Type String // choose your preferred admin name
+                     name: 'Adminname',  // the community admin name // MUST be in one word // Type String // choose your preferred admin name
                      uPhrase: 'vxAT1Fu6lUP4gFjDwnAAAD', // corresponding admin uPhrase // MUST start with "vx" // Type String // choose your preferred phrase
                  },
 
                  {
-                     name: 'AnotherAdminName',
+                     name: 'Anotheradminname',
                      uPhrase: 'vxAT2Fu6lUP4gFjDwnAAAD',
                  },
 
