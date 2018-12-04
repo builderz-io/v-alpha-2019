@@ -155,9 +155,9 @@ exports = module.exports = function(io) {
                     srArray[0] == '' ? errorTx(i18n.strErTx175) :
                     amount <= 0 ? errorTx(i18n.strErTx110) :
                     (request == true || transfer == true) && reason.length < 11 ? errorTx(i18n.strErTx240) :
-                    srArray[0].role == 'network' && srArray[1].role != 'network' ? errorTx(i18n.strErTx125) :
                     exp.diff(moment(date), 'days') < 0 ? errorTx(i18n.strErTx120):
                     recipients.length < 1 ? errorTx(i18n.strErTx130) :
+                    srArray[0].role == 'network' && srArray[1].role != 'network' ? errorTx(i18n.strErTx125) :
                     request === false && recipients.indexOf(socket.user) != -1 ? errorTx(i18n.strErTx140 + ' <span class="currency-unit">' + i18n.str60010 + '</span> ' + i18n.strErTx141) :
                     [ amount, sender, recipients, reason, timeSecondsUNIX ];
 
