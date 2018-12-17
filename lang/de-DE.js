@@ -2,13 +2,13 @@ module.exports = {
 
   str50010: 'für',  // Trigger-Wort
   str50020: 'empfange',   // Trigger-Wort
-  str50030: 'transfer', // Trigger-Wort
+  str50030: 'leite', // Trigger-Wort
 
   str60010: 'V', // currency unit
 
   strSysI110: 'Grundauszahlung',  // Title for payout given as reference
   strSysI120: 'täglich',  // display interval string in community statistics // e.g. "daily", "weekly" etc...
-  strSysI130: '120 Tage',  // display time-to-zero info in community statistics // e.g. "1 day", "6 months" etc...
+  strSysI130: '120 days',  // display time-to-zero info in community statistics // e.g. "1 day", "6 months" etc...
   strSysI140: 'Tage',  // column title in tx history page for time-to-zero // e.g. "Days"
   strSysI150: 'Pool zur Sammlung der Transaktionssteuer. 15% der Transaktionsgebühr von jeder getätigten Überweisung im Citylab-Netzwerk werden diesem Pool zugeschrieben und stehen dann der Gemeinschaft zur Verfügung.',
 
@@ -36,12 +36,13 @@ module.exports = {
   strErTx175: 'Ungültiger Absender, um einen Transfer zu initiieren',
   strErTx180: 'Der Pool wurde deaktiviert',
   strErTx190: 'Der Pool ist abgelaufen',
-  strErTx200: 'Du kannst innerhalb von 24 Stunden nur eine Anfrage stellen.',
+  strErTx200: 'Du kannst innerhalb von 24 Stunden nur eine Anfrage stellen',
   strErTx210: 'Kontostand des Pools zu niedrig für diese Überweisung',
   strErTx220: 'Das wäre schön... leider brauchst Du immernoch',
-  strErTx223: ', um eine solche Überweisung zu tätigen.',
+  strErTx223: ', um eine solche Überweisung zu tätigen',
   strErTx230: 'Kontostand zu niedrig für eine Überweisung von',
-  strErTx240: 'Bitte gebe eine genauere Referenz an im Falle einer Anfrage oder eines Transfers.',
+  strErTx240: 'Bitte gebe eine genauere Referenz an im Falle einer Anfrage oder eines Transfers',
+  strErTx250: 'Du musst der Eigentümer des Kontos sein für einen Transfer',
 
   strNfTx110: 'Du hast',
   strNfTx111: 'erhalten ', // Leerzeichen benötigt
@@ -66,14 +67,16 @@ module.exports = {
   strPfPg556: 'Persönlicher Schlüssel',
   strPfPg557: 'Name',
   strPfPg558: 'Profil',
+  strPfPg559: 'Tag',
   strPfPg570: 'Admin Schlüssel:',
   strPfPg580: 'deaktivieren',
   strPfPg600: 'Gemeinschaftspools',
   strPfPg610: 'Angebote & Orte',
   strPfPg620: 'Beiträge',
+  strPfPg630: 'Du verwaltest derzeit folgende Konten',
 
   strInit110: 'Startkapital',
-  strInit120: 'Initialbetrag',
+  // strInit120: deleted
   strInit130: '',
   strInit140: 'Hallo Welt! Hier ist',
   strInit143: 'Stelle Dich im Chat vor ...',
@@ -86,6 +89,7 @@ module.exports = {
   strCmPg514: 'Statistiken',
   strCmPg515: 'Transaktionsgebühr',
   strCmPg516: 'Ablaufzeit',
+  // strCmPg517: deleted
   strCmPg518: 'Intervall',
   strCmPg519: 'Zahlung',
   strCmPg520: 'Token-Dynamik',
@@ -93,6 +97,7 @@ module.exports = {
   strCmPg522: 'Twitter',
   strCmPg523: 'Facebook',
   strCmPg524: 'Social Media',
+  strCmPg525: 'Telegram',
   strCmPg530: 'Aktive Pools',
   strCmPg540: 'Steuer Pool Kontostand',
   strCmPg550: 'Aktive Betiträge',
