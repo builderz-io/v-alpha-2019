@@ -3,9 +3,8 @@ var mongoose = require('mongoose');
 var msgSchema = mongoose.Schema({
   msg: String,
   sender: String,
+  senderTag: String,
   time: Date,
 });
 
-var ChatDB = mongoose.model('Message', msgSchema);
-
-module.exports = ChatDB;
+module.exports = mongoose.model('Message', msgSchema);

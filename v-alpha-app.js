@@ -1,4 +1,4 @@
-// Value Instrument Alpha | Version 0.3.5.0 | Install __ | Apache 2.0 License | https://github.com/valueinstrument/vi-alpha
+// Value Instrument Alpha | Version 0.3.6.0 | Apache 2.0 License | https://github.com/valueinstrument/vi-alpha
 
 //*****************    System Init    ********************* //
 
@@ -16,14 +16,14 @@ const daysToZero = systemInit.tokenDyn.daysToZero;
 const baseTimeToZero = systemInit.tokenDyn.baseTimeToZero * daysToZero;
 const payout = systemInit.tokenDyn.payout;
 
-var express = require('express')
-var app = express();
-var compression = require('compression');
-var minify = require('express-minify');
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var path = require('path');
-var mongoose = require('mongoose');
+const express = require('express');
+const app = express();
+const compression = require('compression');
+const minify = require('express-minify');
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const path = require('path');
+const mongoose = require('mongoose');
 
 // database
 
@@ -36,11 +36,22 @@ const TxDB = require('./db/transactions');
 
     mongoose.connect('mongodb://localhost/' + commName.replace(/\s/g, '-'), function (err) {
       if (err) {
-          reject();
-          console.log(err);
+        reject();
+        console.log(err);
       } else {
         if (!(systemInit.production)) {
           mongoose.connection.db.dropDatabase(function (err) {
+
+            if (err) {
+              console.log(err);
+              reject();
+            }
+
+            require('./functions/database-initialization').dbInit();
+            systemInit.geoModule ? require('./public/plugins/map/js/geoDemoContent').geoDemo() : null ;  // optionally load demo/testing content
+            systemInit.poolModule ? require('./public/plugins/pool/js/poolDemoContent').poolDemo() : null ;  // optionally load demo/testing content
+            systemInit.contributionModule ? require('./public/plugins/contribution/js/qcDemoContent').contributionDemo() : null ;  // optionally load demo/testing content
+
             resolve();
             console.log('(' + formattedDate + ') ' + 'Dropped MongoDB ');
             console.log('(' + formattedDate + ') ' + 'Connected to MongoDB ');
@@ -51,96 +62,22 @@ const TxDB = require('./db/transactions');
           console.log('(' + formattedDate + ') ' + 'Kept MongoDB intact');
           console.log('(' + formattedDate + ') ' + 'Connected to MongoDB ');
 
-          /* // Upgrade old version to 0.3.0
-
-          mongoose.connection.db.collection('users').rename('entities', function(err, res) {
-
-            require('./db/dbInit').dbInit();
-            require('./public/plugins/map/js/geoDemoContent').geoDemo();  // optionally load demo/testing content
-            require('./public/plugins/pool/js/poolDemoContent').poolDemo();  // optionally load demo/testing content
-
-
-            GeoDB = mongoose.model('Geo', mongoose.Schema({}));
-
-             GeoDB.find({}, { _id: 0 }).exec((err, res) => {
-              res.forEach((geoIn) => {
-
-                var geo = geoIn.toObject()
-
-                  var transferGeo = new EntityDB({
-                    name: geo.name + "'s offer",
-                    type: geo.type,
-                    geometry: geo.geometry,
-                    properties: geo.properties,
-                    role: 'location',
-                    status: 'active',
-                    uPhrase: 'vlxOfferLogin' + Math.floor((Math.random() * 1000) + 1),
-                    stats: {
-                      sendVolume: 0,
-                      receiveVolume: 0,
-                    },
-                    profile: {
-                      name: geo.name + "'s offer",
-                      role: 'location',
-                      status: 'active',
-                      karma: 10,
-                      socketID: 'offline',
-                      joined: "2018-11-02T19:33:10.453Z",
-                      lastLogin: "2018-11-02T19:33:10.453Z",
-                      accessExpires: "2019-03-02T19:33:10.453Z",
-                      timeZone: '',
-                    },
-                    onChain: {
-                      balance: 960,
-                      lastMove: 1541186428,
-                      timeToZero: 10368000,
-                    }
-                  }).save((err, res) => { err ? console.log(err) : console.log('Transfered Geo to EntityDB');
-
-                    var newTx = new TxDB({
-                      name: geo.name + "'s offer",
-                      txHistory: {
-                        date: "2018-11-02T19:33:10.453Z",
-                        from: commName,
-                        to: geo.name + "'s offer",
-                        for: 'Ignition Balance',
-                        burned: 0,
-                        tt0: 10368000,
-                        credit: 960,
-                        chainBalance: 960,
-                      }
-                    }).save((err, res) => { err ? console.log(err) : console.log('Wrote new Geo balance to TxDB'); });
-
-                  });
-
-                })
-              })
-            })
-
-          // end Upgrade */
-
         }
       }
-    })
+    });
   });
-
-  if (!(systemInit.production)) {
-    require('./db/dbInit').dbInit();
-    systemInit.geoModule ? require('./public/plugins/map/js/geoDemoContent').geoDemo() : null ;  // optionally load demo/testing content
-    systemInit.poolModule ? require('./public/plugins/pool/js/poolDemoContent').poolDemo() : null ;  // optionally load demo/testing content
-    systemInit.contributionModule ? require('./public/plugins/contribution/js/qcDemoContent').contributionsDemo() : null ;  // optionally load demo/testing content
-  };
 
   // set all users to offline on start
 
   EntityDB.find().select('profile').exec((err, res) => {
-      res.forEach(res => {
-        res.profile.socketID = 'offline';
-        res.save();
-      })
+    res.forEach(res => {
+      res.profile.socketID = 'offline';
+      res.save();
     });
+  });
 
-})() // end async
+
+})(); // end async
 
 // app & server
 
@@ -189,7 +126,7 @@ const tools = require('./functions/tools');   // get tool functions
 //*****************    Update Visualizations Frequently    ********************* //
 
 
-setInterval( function () { tools.updateVisualizations(io) }, systemInit.tokenDyn.updateVisFreq * 1000 );
+setInterval( function () { tools.updateVisualizations(io); }, systemInit.tokenDyn.updateVisFreq * 1000 );
 
 
 
@@ -202,47 +139,47 @@ function payoutEmit() {
 
   EntityDB.find({ role: { $in: ['admin', 'network', 'member' ] } } ).select('-profile').exec()
     .then (res => {
-      for (i = 0; i < res.length; i++) {
-        var payoutSave = payoutFunction(res[i]);
+      for (let i = 0; i < res.length; i++) {
+        let payoutSave = payoutFunction(res[i]);
         payoutSave.save();
-      };
+      }
     })
-    .catch(err => { handleMongoDBerror('Payout', err)} );
+    .catch(err => { handleMongoDBerror('Payout', err);} );
 
   function payoutFunction(user) {
-      var timeSecondsUNIX = Number(Math.floor(Date.now() / 1000));
-      var burnedRecipientBlocks = timeSecondsUNIX - user.onChain.lastMove;
-      var burnedRecipientBalance = Math.ceil(user.onChain.balance - ( user.onChain.balance / (user.onChain.timeToZero / burnedRecipientBlocks)));
-      var burnedRecipientDelta = user.onChain.balance - burnedRecipientBalance;
-      var newBalance = burnedRecipientBalance + payout;
-      var remainingTimeToZero = user.onChain.lastMove + user.onChain.timeToZero - timeSecondsUNIX;
-      var newTimeToZero = Math.floor(remainingTimeToZero * (burnedRecipientBalance / newBalance) + baseTimeToZero * ( payout / newBalance ));
+    const timeSecondsUNIX = Number(Math.floor(Date.now() / 1000));
+    const burnedRecipientBlocks = timeSecondsUNIX - user.onChain.lastMove;
+    const burnedRecipientBalance = Math.ceil(user.onChain.balance - ( user.onChain.balance / (user.onChain.timeToZero / burnedRecipientBlocks)));
+    const burnedRecipientDelta = user.onChain.balance - burnedRecipientBalance;
+    const newBalance = burnedRecipientBalance + payout;
+    const remainingTimeToZero = user.onChain.lastMove + user.onChain.timeToZero - timeSecondsUNIX;
+    const newTimeToZero = Math.floor(remainingTimeToZero * (burnedRecipientBalance / newBalance) + baseTimeToZero * ( payout / newBalance ));
 
-      var date = new Date();
+    const date = new Date();
 
-      TxDB.findOneAndUpdate(
-        {name: user.name},
-        { $push: { txHistory: {
-          date: date,
-          from: commName,
-          to: user.name,
-          for: systemInit.tokenDynDisplay.payoutTitle,
-          burned: burnedRecipientDelta,
-          tt0: remainingTimeToZero,
-          credit: payout,
-          chainBalance: newBalance,
-        }}},
-        (err) => { if (err) return handleMongoDBerror('Push Payout Tx to DB', err) }
-      );
+    TxDB.findOneAndUpdate(
+      {name: user.name},
+      { $push: { txHistory: {
+        date: date,
+        from: commName,
+        to: user.name,
+        for: systemInit.tokenDynDisplay.payoutTitle,
+        burned: burnedRecipientDelta,
+        tt0: remainingTimeToZero,
+        credit: payout,
+        chainBalance: newBalance,
+      }}},
+      (err) => { if (err) return handleMongoDBerror('Push Payout Tx to DB', err); }
+    );
 
-      user.onChain.balance = newBalance;
-      user.onChain.lastMove = timeSecondsUNIX;
-      user.onChain.timeToZero = newTimeToZero;
+    user.onChain.balance = newBalance;
+    user.onChain.lastMove = timeSecondsUNIX;
+    user.onChain.timeToZero = newTimeToZero;
 
-      return user
-    }
+    return user;
+  }
 }
 
 function handleMongoDBerror(req, err) {
-   console.log('(' + Date.now() + ') ' + 'MongoDB Error - ' + req + ' - ' + err);
+  console.log('(' + Date.now() + ') ' + 'MongoDB Error - ' + req + ' - ' + err);
 }

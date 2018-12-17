@@ -624,6 +624,10 @@ section {
 
 .currency-unit { text-decoration: line-through; }
 
+.user-tag {
+  font-size: 0.5em;
+}
+
 .form-width {
   max-width: 600px;
   margin: 0px auto;
@@ -717,7 +721,7 @@ textarea {
   /* display: block; */
   box-sizing: padding-box;
   /* overflow: hidden; */
-  padding: 6px 16px;
+  padding: 7px 16px 7px;
   max-width: 445px;
   max-height: 150px;
   border-radius: 20px;

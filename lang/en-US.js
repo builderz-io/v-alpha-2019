@@ -1,8 +1,8 @@
 module.exports = {
 
-  str50010: 'for', // trigger word
-  str50020: 'request', // trigger word
-  str50030: 'transfer', // trigger word
+  str50010: 'for', // trigger word "for"
+  str50020: 'request', // trigger word "request"
+  str50030: 'transfer', // trigger word "transfer"
 
   str60010: 'V', // currency unit
 
@@ -42,6 +42,7 @@ module.exports = {
   strErTx223: 'to make such large transaction. How about offering something great to the community?',
   strErTx230: 'Not enough balance to send',
   strErTx240: 'You must provide a more detailed reference when requesting or transferring funds.',
+  strErTx250: 'You must be the account-creator to transfer',
 
   strNfTx110: 'You received',
   strNfTx111: '',
@@ -65,14 +66,16 @@ module.exports = {
   strPfPg556: 'Unique Phrase',
   strPfPg557: 'Username',
   strPfPg558: 'Profile',
+  strPfPg559: 'Tag',
   strPfPg570: 'Admin Phrase:',
   strPfPg580: 'disable',
   strPfPg600: 'Community Pools',
   strPfPg610: 'Offers & Locations',
   strPfPg620: 'Contributions',
+  strPfPg630: 'You currently administer the following accounts',
 
-  strInit110: 'Welcome Balance',
-  strInit120: 'Ignition Balance',
+  strInit110: 'Ignition Balance',
+  // strInit120: deleted
   strInit130: '',
   strInit140: 'Hello World! This is',
   strInit143: 'Please introduce yourself ...',
@@ -85,6 +88,7 @@ module.exports = {
   strCmPg514: 'Statistics',
   strCmPg515: 'Transaction Fee',
   strCmPg516: 'Time To Zero',
+  // strCmPg517: deleted
   strCmPg518: 'Interval',
   strCmPg519: 'Payout',
   strCmPg520: 'Token Dynamic',
@@ -92,6 +96,7 @@ module.exports = {
   strCmPg522: 'Twitter',
   strCmPg523: 'Facebook',
   strCmPg524: 'Social Links',
+  strCmPg525: 'Telegram',
   strCmPg530: 'Active Pools',
   strCmPg540: 'Tax Pool Balance',
   strCmPg550: 'Active Contributions',

@@ -20,7 +20,13 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You need MongoDB installed and running.
+- You need node.js installed and running.
+
+```
+https://nodejs.org/en/
+```
+
+- You need MongoDB installed and running.
 
 Linux
 ```
@@ -37,11 +43,7 @@ Windows
 https://docs.mongodb.com/manual/tutorial/install-mongodb-on-windows/
 ```
 
-You need node.js installed and running.
 
-```
-https://nodejs.org/en/
-```
 
 ### Installing
 
@@ -65,33 +67,13 @@ Install dependencies
 npm install
 ```
 
-Rename systemInit-example.js to systemInit.js and setup your preferred settings. The minimum you should set are the following details, the other settings are decent presets and can be explored later.
-
-```
-exports.admins = [
-
-                 {
-                     name: 'Yourname',  // MUST be one word
-                     uPhrase: 'vxAnyPassPhrase'
-                 },
-
-               ];
-
- exports.communityGovernance = {
-                                   commName: 'Your Community',
-                                   commuPhrase: 'vxAnyOtherPassPhrase',  
-                               }
-
-
-```
-
+### Starting the application
 
 To start the backend
 
 ```
 node v-alpha-app.js
 ```
-
 
 To run the frontend use any browser and access
 
@@ -100,9 +82,19 @@ localhost:3021
 ```
 
 
-## Testing
+### Testing
 
-Setup test-users across several browsers to send Value between these users.
+Setup test-users across several browsers to send Value between these users. Sending funds is triggered by entering commands into the chat message field:
+
+"send 5 to peter"
+
+or
+
+"+5 peter"
+
+You can include a reference for the transaction:
+
+"send 5 to peter for electric guitar lessons"
 
 
 ## Setting the language
@@ -136,10 +128,41 @@ var appLang="en-US.js"
 
 Use Ubuntu, Nginx, PM2 or the like to run this on a public server.
 
-In systemInit.js set "production" from false to true, once you wish to run the install without dropping the database on system restarts
+Setup your preferred settings in
+
+```
+systemInit.js
+```
+
+Set "production" from false to true, once you wish to run the install without dropping the database on system restarts
 
 ```
 exports.production = true
+
+```
+
+The minimum you should set in a live environment are the following credentials. The other settings are decent presets and can be explored later.
+
+```
+exports.admins = [
+
+                 {
+                     name: 'Yourname',  // MUST be one word
+                     uPhrase: 'vxAnyPassPhrase' // MUST start with "vx"
+                 },
+
+               ];
+
+ exports.communityGovernance = {
+                                   commName: 'Yourcommunity',  // MUST be one word
+                                   commuPhrase: 'vxAnySecondPassPhrase',   // MUST start with "vx"
+                               }
+
+
+exports.taxPool = {
+                    name: 'Tax', // MUST be one word
+                    uPhrase: 'vxAnyThirdPassPhrase', // MUST start with "vx"
+                 }
 
 ```
 
@@ -150,8 +173,6 @@ exports.production = true
 * socket.io
 * moment.js
 * MongoDB / mongoose.js
-* [Pushy Layout](https://chrisyee.ca/pushy/)
-* [html5 Boilerplate](https://html5boilerplate.com/)
 
 
 ## Authors
