@@ -1,11 +1,11 @@
 
 exports.production = false;  // resets or keeps database when restarting app // Type Boolean // 'false' to reset
 
-exports.poolModule = true;  // enables/disables Pool Plugin // Type Boolean // 'true' to enable
+exports.poolModule = false;  // enables/disables Pool Plugin // Type Boolean // 'true' to enable
 
-exports.geoModule = true;   // enables/disables Location Plugin // Type Boolean // 'true' to enable
+exports.geoModule = false;   // enables/disables Location Plugin // Type Boolean // 'true' to enable
 
-exports.contributionModule = true;   // enables/disables Contribution Plugin // Type Boolean // 'true' to enable
+exports.contributionModule = false;   // enables/disables Contribution Plugin // Type Boolean // 'true' to enable
 
 exports.language = 'en-US';  // sets the app-language // Type String // e.g. en US for English, de DE for German
 
