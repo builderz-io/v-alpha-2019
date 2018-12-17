@@ -357,6 +357,8 @@ exports = module.exports = function(io) {
 
         if (res[i].credentials.role === 'member' || res[i].credentials.role === 'admin') {
           verified = ' <i class="fas fa-star verified-user"></i>';
+        } else {
+          verified = '';
         }
 
         if (res[i].credentials.role != 'disabled') {
