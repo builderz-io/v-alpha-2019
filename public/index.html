@@ -32,6 +32,7 @@
 	<!-- link rel="shortcut icon" href="favicon.ico" -->
 
 	<link rel="stylesheet" href="/css/style.css" />
+	<link rel="stylesheet" href="/css/colours1.css" />
 
 	<link rel="preload" href="/webfonts/Prompt-ExtraLight.ttf" as="font" crossorigin>
 	<link rel="preload" href="/webfonts/Prompt-Regular.ttf" as="font" crossorigin>
@@ -106,16 +107,13 @@
           <button id="comm-profile" class="off-white-text"></button>
           <ul id="profile-list">
               <li class="pushy-link"><button id="about-btn" class="btn-in-menu off-white-text"></button></li>
-	      <!--li class="pushy-link"><button id="pool-btn" class="btn-in-menu off-white-text"></button></li>
-	      <li class="pushy-link"><button id="contribution-btn" class="btn-in-menu off-white-text"></button></li>
-              <li class="pushy-link"><button id="location-btn" class="btn-in-menu off-white-text"></button></li-->
           </ul>
         </li>
         <li class="pushy-submenu">
           <button id="account-profile" class="off-white-text"></button>
           <ul id="profile-list">
               <li class="pushy-link"><button id="profile-btn" class="btn-in-menu off-white-text"></button></li>
-              <li class="pushy-link"><button id="download-btn" class="btn-in-menu off-white-text"></button></li>
+							<li class="pushy-link"><button id="download-btn" class="btn-in-menu off-white-text"></button></li>
               <li class="pushy-link ext-link"><a href="http://valueinstrument.org/alpha-help" target="_blank" class="off-white-text" id="help-link"></a></li>
               <!--li class="pushy-link ext-link"><a href="http://valueinstrument.org/contact" target="_blank" class="off-white-text" id="report-link"></a></li-->
               <li class="pushy-link"><button id="offline-btn" class="btn-in-menu off-white-text"></button></li>
@@ -164,7 +162,7 @@
 				<button id="signup-button" class="signup-btn off-black-bgrnd off-white-text"></button>
 			</form>
 
-      <form id="textarea-form" class="form-width" action="">
+      <form autocomplete="off" id="textarea-form" class="form-width" action="">
         <textarea id="textarea-text" class="autoExpand message-textarea off-white-bgrnd" rows="1" data-min-rows="1"></textarea>
         <button id="textarea-button" class="send-btn off-black-bgrnd off-white-text"><i class="fas fa-paper-plane"></i></button>
       </form>
@@ -177,7 +175,7 @@
   			<div class="page-title"></div>
   			<div class="page-pipe"></div>
   		</div>
-  		<i class="fas fa-times-circle page-off-white-text"></i>
+  		<i class="fas fa-times-circle close-page page-off-white-text"></i>
 			<div id="top-right-close"></div>
   	</div>
 
@@ -192,16 +190,11 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="js/js.cookie.min.js"></script>
 
-<script src="lang/triggers.js"></script>
-<script src="js/tools.js"></script>
-
 <script src="lang/en-US.js"></script>
 <script> var appLang="en-US.js" </script>
 
-
-<script src="plugins/map/js/v-alpha-map-front.js"></script>
-<script src="plugins/pool/js/v-alpha-pool-front.js"></script>
-<script src="plugins/contribution/js/v-alpha-qc-front.js"></script>
+<script src="lang/triggers.js"></script>
+<script src="js/tools.js"></script>
 
 <script src="js/v-alpha-front.js"></script>
 

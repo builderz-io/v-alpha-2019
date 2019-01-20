@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 var entitySchema = mongoose.Schema({
-
+  fullId: String, // name + tag
   credentials: {
     name: String,
     tag: String,
@@ -10,7 +10,7 @@ var entitySchema = mongoose.Schema({
     status: String,
     socketID: String,
   },
-  credsETH: {
+  ethCredentials: {
     address: String,
     privKey: String,
     pass: String,
@@ -21,6 +21,14 @@ var entitySchema = mongoose.Schema({
     loginExpires: Date,
     timeZone: String,
   },
+  owners: [{
+    ownerName: String,
+    ownerTag: String,
+  }],
+  admins: [{
+    adminName: String,
+    adminTag: String,
+  }],
   properties: {
     description: String,
     creator: String,

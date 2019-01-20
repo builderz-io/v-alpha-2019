@@ -1,74 +1,17 @@
-/* --------------------------------- Color Scheme
 
-https://htmlcolorcodes.com/resources/best-color-palette-generators/
+/* --------------------------------- Autocomplete Names
 
 -------------------------------------------------------------------------------*/
 
-.off-white-text {
- color: #F6EFFF  /* #F3EFFF */
-}
+.autocomplete-suggestions {
+    text-align: left; cursor: default; border: 1px solid #ccc; border-top: 1; box-shadow: -2px 1px 3px rgba(0,0,0,.1);
 
-.off-white-bgrnd {
- background-color: #F6EFFF
+    position: absolute; display: block; z-index: 300; max-height: 254px; overflow: hidden; overflow-y: auto; box-sizing: border-box;
+    border-radius: 20px;
+        padding: 11px 0px;
 }
-
-.off-black-text, body, select, input, textarea {
- color: #151414
-}
-
-.off-black-bgrnd {
- background-color: #151414
-}
-
-.bar {
-  background-color: #F6EFFF
-}
-
-#select-menu {
-    background-color: #151414
-}
-
-.chart-text {
-  fill: rgb(65, 183, 135);
-}
-
-.confirm-text {
- color: #1e860d
-}
-
-.alert-text {
- color: #B10F2E;
-}
-
-.alert-bgrd {
-  background: white;
-padding: 2px 10px;
-border-radius: 3px;
-}
-
-.highlight {
-  background-color: #8EA5FF;
-}
-
-a {
-	color: #8EA5FF;
-}
-
-.verified-user {
- color: rgb(99, 82, 185);
-}
-
-.online-user {
- color: #41B787;
-}
-
-#system-message {
- color: coral;
-}
-
-.page-off-white-text {
-	color: WhiteSmoke;
-}
+.autocomplete-suggestion { position: relative; padding: 0 .6em; line-height: 23px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.02em; color: #333; }
+.autocomplete-suggestion.selected { background: #f0f0f0; }
 
 
 
@@ -627,6 +570,11 @@ section {
 .user-tag {
   font-size: 0.5em;
 }
+.notification-symbol {
+  font-size: 0.8em;
+    position: relative;
+    top: -1px;
+}
 
 .form-width {
   max-width: 600px;
@@ -725,11 +673,12 @@ textarea {
   max-width: 445px;
   max-height: 150px;
   border-radius: 20px;
-  border: 0px solid lightgray;
   font-family: inherit;
   width: 54%;
   position: absolute;
   bottom: 7px;
+  border: 1px solid #ccc;
+  box-shadow: -2px 1px 3px rgba(0,0,0,.1);
 }
 
 .send-btn {
@@ -751,10 +700,32 @@ textarea {
     bottom: 10px;
 }
 
+.copy-btn {
+  color: #b10f2e;
+  padding: 4px 11px;
+  margin-left: 3px;
+  background: whitesmoke;
+  border-radius: 3px;
+  border: none;
+  font-size: 0.85em;
+}
+.copy-btn:hover {
+
+  background: white;
+  border-radius: 5px;
+}
+
+.copy-btn:active {
+
+  background: whitesmoke;
+  border-radius: 7px;
+  border: none;
+}
+
 #select-menu {
   position: fixed;
     bottom: 70px;
-    width: 175px;
+    width: 178px;
     left: 4px;
     padding-left: 10px;
 }
@@ -842,6 +813,8 @@ textarea {
   font-family: inherit;
   background-color: lightgreen;
   border: none;
+  float: left;
+  margin-right: 4px;
   }
 
 #cancel-offline {
@@ -849,6 +822,22 @@ textarea {
   font-family: inherit;
   background-color: orangered;
   border: none;
+  float: left;
+}
+
+#go-offline:hover {
+  color: green;
+}
+
+#cancel-offline:hover {
+  color: whitesmoke;
+}
+#go-offline:active {
+  border-radius: 10px;
+}
+
+#cancel-offline:active {
+  border-radius: 10px;
 }
 
 
@@ -874,10 +863,12 @@ textarea {
 }
 
 .notification-container {
+  position: relative;
   font-size: 0.83em;
   padding: 13px 16px;
-  margin-bottom: 6px;
+  margin-bottom: 21px;
   border-radius: 3px;
+  cursor: pointer;
 }
 
 .message-container {
@@ -891,6 +882,13 @@ textarea {
 
 .message-p {
   margin-bottom: 6px;
+}
+
+.close-x {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  font-size: 0.9em;
 }
 
 .strong-weight {
@@ -1113,8 +1111,8 @@ input[type="checkbox"]:checked ~ label .middle {
   position: relative;
 }
 
-.fa-times-circle {
-  font-size: 1.8em;
+.close-page {
+    font-size: 1.8em;
     text-align: center;
     right: 0;
     position: fixed;
@@ -1226,8 +1224,14 @@ https://github.com/christophery/pushy/
 }
 @media screen and (min-width: 700px) {
 
-  #container, #site-header, #page, .page-content, .fa-times-circle {
+  #container, #site-header, #page, .page-content, .close-page {
     left: 205px;
+  }
+
+  .form-width {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 210px;
   }
 
   input[type=checkbox]:checked ~ #container {
@@ -1251,7 +1255,7 @@ https://github.com/christophery/pushy/
   }
 
   .send-btn {
-    right: 23%;
+    right: 5%;
   }
 
   #name-in-header {
@@ -1266,3 +1270,17 @@ https://github.com/christophery/pushy/
     padding-right: 20%;
 
   }
+
+}
+@media screen and (min-width: 870px) {
+
+  .send-btn {
+    right: 15%;
+  }
+}
+@media screen and (min-width: 960px) {
+
+  .send-btn {
+    right: 20%;
+  }
+}

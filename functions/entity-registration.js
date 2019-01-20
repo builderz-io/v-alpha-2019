@@ -1,163 +1,186 @@
 
-const systemInit = require('../systemInit');
-const i18n = require('../lang/' + systemInit.language);
+const systemInit = require( '../systemInit' );
+const i18n = require( '../lang/' + systemInit.language );
+const tools = require( './tools' );
 
-const EntityDB = require('../db/entities');
-const TxDB = require('../db/transactions');
+const EntityDB = require( '../db/entities' );
+const TxDB = require( '../db/transactions' );
 
-const moment = require('moment');
+const moment = require( 'moment' );
+
+const capOnWords = systemInit.communityGovernance.capWordLength;
+const humanWords = systemInit.communityGovernance.maxHumanWords;
+const entityWords = systemInit.communityGovernance.maxEntityWords;
+const maxWordLength = systemInit.communityGovernance.maxWordLength;
 
 const commName = systemInit.communityGovernance.commName;
+const commTag = systemInit.communityGovernance.commTag;
+
 const daysToZero = systemInit.tokenDyn.daysToZero;
 const baseTimeToZero = systemInit.tokenDyn.baseTimeToZero * daysToZero;
 
 
-module.exports.writeEntityToDB = (entityData) => {
+module.exports.writeEntityToDB = ( entityData ) => {
+
+  var checkLength = entityData.entry.split( ' ' ).length;
+  var wordLengthExeeded = entityData.entry.split( ' ' ).map( item => { return item.length > maxWordLength } );
 
   if (
-    ['vx', 'Vx'].indexOf(entityData.entry.substring(0,2)) != -1 ||
-       entityData.entry.length > 20 ||
+    ['vx', 'Vx'].includes( entityData.entry.substring( 0, 2 ) ) ||
+       entityData.entry.length > 200 ||
        entityData.entry.length < 2 ||
-       entityData.entry.split(' ').length > 1
-  )
-  {
-    return 'not allowed';
+       checkLength > capOnWords ||
+       ( ['member', 'network'].includes( entityData.role ) && checkLength > humanWords ) ||
+       ( ['member', 'network'].indexOf( entityData.role ) == -1 && checkLength > entityWords ) ||
+       wordLengthExeeded.includes( true )
+  ) {
+    return new Promise( resolve => {
+      resolve( 'not allowed' );
+    } );
   }
 
-  function constructUserName(input) {
-    return input.trim().toLowerCase().split(' ').map(function(string) {
-      return string.charAt(0).toUpperCase() + string.slice(1);
-    }).join(' ');
-  }
-
-  function userTag(tags) {
+  function userTag( tags ) {
     var continueDice = true;
 
-    while (continueDice) { // 334 combinations in the format of #5626
-      const number1 = String(Math.floor(Math.random() * (9 - 2 + 1)) + 2);
-      const number2 = String(Math.floor(Math.random() * (9 - 1 + 1)) + 1);
-      const number3 = String(Math.floor(Math.random() * (9 - 2 + 1)) + 2);
+    while ( continueDice ) { // 334 combinations in the format of #5626
+      const number1 = String( Math.floor( Math.random() * ( 9 - 2 + 1 ) ) + 2 );
+      const number2 = String( Math.floor( Math.random() * ( 9 - 1 + 1 ) ) + 1 );
+      const number3 = String( Math.floor( Math.random() * ( 9 - 2 + 1 ) ) + 2 );
 
       if (
         number2 != number1 &&
            number3 != number1 &&
            number3 != number2 &&
-           [number1, number2, number3].indexOf('7') == -1 &&
+           [number1, number2, number3].indexOf( '7' ) == -1 &&
            number1 + number2 != '69' &&
            number3 + number2 != '69' &&
-           tags.indexOf('#' + number1 + number2 + number3 + number2) == -1
-      )
-      {
+           tags.indexOf( '#' + number1 + number2 + number3 + number2 ) == -1
+      ) {
         continueDice = false;
         return '#' + number1 + number2 + number3 + number2;
       }
     }
   }
 
-  const userData = async () => {
-    return await new Promise((resolve) => {
-      EntityDB.find({'credentials.name': constructUserName(entityData.entry)}).exec( (err, res) => { // {$and: [{name: sender}, {name: recipients[0]}]}
-        const tags = ['#2000'];
-        res.forEach(item => {tags.push(item.tag);});
-        resolve(tags);
-      });
-    });
+  const userData = () => {
+    return new Promise( ( resolve ) => {
+      EntityDB.find( {'credentials.name': tools.constructUserName( entityData.entry )} ).exec( ( err, res ) => { // {$and: [{name: sender}, {name: recipients[0]}]}
+        const tags = [systemInit.initTag];
+        res.forEach( item => {tags.push( item.tag )} );
+        resolve( tags );
+      } );
+    } );
   };
 
-  return new Promise(resolve => {
+  return new Promise( resolve => {
 
-    userData().then(tags => {
+    userData().then( tags => {
 
-      return (async () => {
-
-        if ( tags.length == 1) {
-          return tags;
-        } else {
-          return await userTag(tags);
+      return ( () => {
+        if ( tags.length == 1 ) { return tags }
+        else {
+          return userTag( tags );
         }
+      } )();
 
-      })();
+    } ).then( theOneTag => {
 
-    }).then(theOneTag => {
-
-      const user = constructUserName(entityData.entry);
+      const user = tools.constructUserName( entityData.entry );
       const date = new Date();
 
-      const newEntity = new EntityDB({
-        credentials: {
-          name: user,
-          tag: theOneTag,
-          uPhrase: entityData.uPhrase,
-          role:  entityData.role,
-          status:  entityData.status,
-          socketID: entityData.socketID,
+      const newEntity = new EntityDB( {
+        'fullId': user + ' ' + theOneTag,
+        'credentials': {
+          'name': user,
+          'tag': theOneTag,
+          'uPhrase': entityData.uPhrase,
+          'role':  entityData.role,
+          'status':  entityData.status,
+          'socketID': entityData.socketID,
         },
-        stats: {
-          sendVolume: 0,
-          receiveVolume: 0,
+        'stats': {
+          'sendVolume': 0,
+          'receiveVolume': 0,
         },
-        profile: {
-          joined: date,
-          lastLogin: date,
-          loginExpires: entityData.loginExpires,
-          timeZone: entityData.tz,
+        'profile': {
+          'joined': date,
+          'lastLogin': date,
+          'loginExpires': entityData.loginExpires,
+          'timeZone': entityData.tz,
         },
-        onChain: {
-          balance: entityData.initialBalance,
-          lastMove: Number(Math.floor(date / 1000)),
-          timeToZero: baseTimeToZero,
+        'owners': [{
+          'ownerName': tools.constructUserName( entityData.ownerAdmin.creator ),
+          'ownerTag': entityData.ownerAdmin.creatorTag,
+        }],
+        'admins': [{
+          'adminName': tools.constructUserName( entityData.ownerAdmin.creator ),
+          'adminTag': entityData.ownerAdmin.creatorTag,
+        }],
+        'onChain': {
+          'balance': entityData.initialBalance,
+          'lastMove': Number( Math.floor( date / 1000 ) ),
+          'timeToZero': baseTimeToZero,
         }
-      });
+      } );
 
-      if (entityData.properties) {
+      if ( entityData.properties ) {
         newEntity.properties = entityData.properties;
       }
 
-      if (entityData.geometry) { // entityData.geometry.coordinates.length > 0
+      if ( entityData.geometry ) {
         newEntity.geometry = entityData.geometry;
       }
 
-      newEntity.save((err) => { if (err) { console.log('Error saving new entity to EntityDB - ' + err); return; }
+      if ( entityData.ethCredentials.address ) {
+        newEntity.ethCredentials = entityData.ethCredentials;
+      }
 
-        new TxDB({
-          name: user,
-          tag: theOneTag,
-          txHistory: {
-            date: date,
-            initiator: commName,
-            from: commName,
-            to: user,
-            for: i18n.strInit110,
-            senderFee: 0,
-            burned: 0,
-            tt0: baseTimeToZero,
-            credit: entityData.initialBalance,
-            debit: 0,
-            chainBalance: entityData.initialBalance,
+      newEntity.save( ( err ) => {
+        if ( err ) { console.log( 'Error saving new entity to EntityDB - ' + err ); return }
+
+        new TxDB( {
+          'name': user,
+          'tag': theOneTag,
+          'txHistory': {
+            'date': date,
+            'initiator': commName,
+            'initiatorTag': commTag,
+            'from': commName,
+            'fromTag': commTag,
+            'to': user,
+            'toTag': theOneTag,
+            'for': i18n.strInit110,
+            'senderFee': 0,
+            'burned': 0,
+            'tt0': baseTimeToZero,
+            'credit': entityData.initialBalance,
+            'debit': 0,
+            'chainBalance': entityData.initialBalance,
           }
-        }).save((err) => { if (err) { console.log('Error saving new entity transaction to TxDB - ' + err); return; }
+        } ).save( ( err ) => {
+          if ( err ) { console.log( 'Error saving new entity transaction to TxDB - ' + err ); return }
 
-          console.log('(' + moment().format('D MMM YYYY h:mm a') + ') ' + user + ' ' + theOneTag + ' registered');
+          console.log( '(' + moment().format( 'D MMM YYYY h:mm a' ) + ') ' + user + ' ' + theOneTag + ' registered' );
 
-          resolve({
-            user: user,
-            tag: theOneTag,
-            uPhrase: entityData.uPhrase,
-            loginExpires: entityData.loginExpires,
-            saved: true,
-          });
+          resolve( {
+            'user': user,
+            'tag': theOneTag,
+            'uPhrase': entityData.uPhrase,
+            'loginExpires': entityData.loginExpires,
+            'saved': true,
+          } );
 
-        }); // save inital tx
-      }); // save new user
+        } ); // save inital tx
+      } ); // save new user
 
-    }).catch((err) => {
+    } ).catch( ( err ) => {
 
-      console.log('Issue with new entity signup - ' + err);
+      console.log( 'Issue with new entity signup - ' + err );
 
-      resolve(false);
+      resolve( false );
 
-    }); // end save new User
+    } ); // end save new User
 
-  }); // end new Promise
+  } ); // end new Promise
 
 }; // end module.exports
