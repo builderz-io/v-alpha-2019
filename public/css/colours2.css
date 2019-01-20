@@ -1,0 +1,79 @@
+/* --------------------------------- Color Scheme 2
+
+https://htmlcolorcodes.com/resources/best-color-palette-generators/
+
+-------------------------------------------------------------------------------*/
+
+.off-white-text {
+ color: #F4EBDD  /* #F3EFFF */
+}
+
+.off-white-bgrnd {
+ background-color: #F4EBDD
+}
+
+.off-black-text, body, select, input, textarea {
+ color: #190D26
+}
+
+.off-black-bgrnd {
+ background-color: #190D26
+}
+
+.bar {
+  background-color: #F4EBDD
+}
+
+.autocomplete-suggestions  {
+  background-color: #F4EBDD
+}
+
+#select-menu {
+    background-color: #190D26
+}
+
+.chart-text {
+  fill: rgb(65, 183, 135);
+}
+
+.confirm-text {
+ color: #1e860d
+}
+
+.alert-text {
+ color: #B10F2E;
+}
+
+.alert-bgrd {
+  background: white;
+padding: 2px 10px;
+border-radius: 3px;
+}
+
+.highlight {
+  background-color: #190D26;
+}
+
+.highlight-text {
+	color: #190D26;
+}
+
+a {
+	color: #190D26;
+}
+
+.verified-user {
+ color: rgb(99, 82, 185);
+}
+
+.online-user {
+ color: #41B787;
+}
+
+#system-message {
+ color: coral;
+}
+
+.page-off-white-text {
+	color: WhiteSmoke;
+}

@@ -9,32 +9,42 @@ exports.contributionModule = false;   // enables/disables Contribution Plugin //
 
 exports.language = 'en-US';  // sets the app-language // Type String // e.g. en US for English, de DE for German
 
+exports.initTag = '#2121'; // the first entity tag // MUST be 4 digits preceded by '#' , e.g. '#2121' // Type String
+
 exports.admins = [  // add objects for each admin
 
                  {
-                     name: 'Thomas',  // the community admin name // MUST be in one word // Type String // choose your preferred admin name
-                     tag: '#2000',  // the community admin tag // MUST be 4 digits receded by '#' , e.g. '#2000' // Type String
-                     uPhrase: 'vxiZ8ctAZDlaz1gdvnAABt', // corresponding admin uPhrase // MUST start with "vx" // Type String // choose your preferred phrase
+                   name: 'Thomas Blake',  // the community admin name // MUST be in one word // MUST have capital initials // Type String // choose your preferred admin name
+                   uPhrase: 'vxiZ8ctNNKmsz1gdvnAABt', // corresponding admin uPhrase // MUST start with "vx" // Type String // choose your preferred phrase
+                   tag: exports.initTag,
                  },
 
                  {
-                     name: 'Anna',
-                     tag: '#2000',
-                     uPhrase: 'vxiZ8ctAZDlaz2gdvnAABt',
+                   name: 'Walther Blake',
+                   uPhrase: 'vxiZ8ctagtmsz1gdvnAABt',
+                   tag: exports.initTag,
                  },
 
                ];
 
 exports.communityGovernance = {
-                                  commName: 'Value',  // the community name // MUST be in one word // Type String
-                                  commTag: '#2000',  // the community tag // MUST be 4 digits receded by '#' , e.g. '#2000' // Type String
-                                  commuPhrase: 'vxiZ0ctNNKmsz0gdvnAABt',  // corresponding community uPhrase // MUST start with "vx" // Type String
-                                  commIgnition: 900,  // token amount for community account at start // Type Number (integer)
+                                  commName: 'Value',  // the community name // MUST be in one word // MUST have capital initials // Type String
+                                  commuPhrase: 'vxVITestLogin',  // corresponding community uPhrase // MUST start with "vx" // Type String
+                                  commTag: exports.initTag,
+                                  commIgnition: 9000,  // token amount for community account at start // Type Number (integer)
                                   fb: 'valueinstrument',  // Social Media Links // Type String
                                   tw: 'valueinstrument',
                                   web: 'valueinstrument.org',
                                   tele: '',
+                                  allowPublic: true,  // allow public user signup
+                                  limitTransactions: false,  // unverified entities can only transact with other unverified entities // Type Boolean // 'true' to enable
+                                  limitCreation: false,  // unverified entities can not create pools or other entities // Type Boolean // 'true' to enable
+                                  capWordLength: 7,  // a cap on the number of words in an entity name that the system can handle
+                                  maxEntityWords: 7,  // max allowed words in entity names (not humans) // MUST be less or equal to capWordLength
+                                  maxHumanWords: 3,  // max allowed words in human entity names // MUST be less or equal to capWordLength
+                                  maxWordLength: 12  // max allowed length of each word in name
                               }
+
 
 exports.tokenDyn = {  // alpha.valueinstrument.org
                       baseTimeToZero: 60 * 60 * 24,  // token-lifetime in seconds // e.g. 60 * 60 * 24 is one day // Type Number (integer)
@@ -42,7 +52,7 @@ exports.tokenDyn = {  // alpha.valueinstrument.org
                       payout: 24,  // regular payout amount // expressed in tokens // Type Number (integer)
                       payoutInterval: 60 * 60 * 24,  // regular payout interval // expressed in sec // Maximum delay value is 24 days // Type Number (integer)
                       initialBalance: 24 * 40,  // initial balance on new accounts // expressed in tokens // Type Number (integer)
-                      updateVisFreq: 60 * 15,  // how often the user interface updates // expressed in sec // Type Number (integer)
+                      updateVisFreq: 60 * 60,  // how often the user interface updates // expressed in sec // Type Number (integer)
                       setTxFee: 0.3333333333,  // transaction fee // e.g. 0.5 for 50%, can also be 0 // Type Number (decimal)
                   }
 
@@ -62,21 +72,21 @@ exports.tokenDynDisplay = {  // refer to language files also
 
 exports.taxPool = {  // refer to language files also
                      name: 'Tax',  // the community tax pool name // MUST be in one word // Type String
-                     tag: '#2000',
-                     uPhrase: 'vxiZ9ctAZDlaz9gdvnAABt', // corresponding community tax pool uPhrase // MUST start with "vpx" // Type String
+                     uPhrase: 'vxTXTestLogin', // corresponding community tax pool uPhrase // MUST start with "vpx" // Type String
+                     tag: exports.initTag,
                      description: i18n.strSysI150,  // tax pool description // Type string
-                     target: 0,  // tax pool target // Type Number (integer)
-                     ignition: 1,  // tax pool first balance // MUST be greater than 0 // Type Number (integer)
+                     target: 20000,  // tax pool target // Type Number (integer)
+                     ignition: 100,  // tax pool first balance // MUST be greater than 0 // Type Number (integer)
                      commTax: 0.15,  // taxation on transaction calculated FROM TX FEE (!) expressed in decimal number such as 0.1 for 10% // Type Number (decimal)
                      displayInPools: true,  // display tax pool in pools list // 'true' to display // Type Boolean
                      displayInStats: true,  // display tax pool balance in community stats // 'true' to display // Type Boolean
                   }
 
 exports.poolGovernance = {
-                            ignition: 7,  // new pool first balance expressed in tokens // Type Number (integer)
+                            ignition: 100,  // new pool first balance expressed in tokens // Type Number (integer)
                             timeLimit: 60 * 60 * 24,  // time limit on requesting funds, expressed in seconds // Type Number (integer)
                             maxRequest: 100,  // limit of amount when requesting funds, expressed in tokens // Type Number (integer)
-                            minTarget: 1,  // minimum target, expressed in tokens // MUST be greater than 0 // Type Number (integer)
+                            minTarget: 100,  // minimum target, expressed in tokens // MUST be greater than 0 // Type Number (integer)
                             taxOnTx: false,  // taxation on pool transactions? // 'true' to enable // Type Boolean
                             expires: 6,  // automatic pool expiry, expressed in months // Type Number (integer)
                             fillPeriod: 7,  // how long a pool can be filled, expressed in days // Type Number (integer)
