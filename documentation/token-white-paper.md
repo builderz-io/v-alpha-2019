@@ -302,6 +302,7 @@ Figure 1 demonstrates visually, how the account balance's lifetime extends forwa
 Simplified Account Trajectory Example
 --------------------------------------
 
+![](Value-Instrument-Account-Trajectory.png)
 
 **Figure 2**
 
