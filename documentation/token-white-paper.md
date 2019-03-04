@@ -292,6 +292,7 @@ Expressed as JSON object: {  balance: 900, timeToZero: 41110, lastMove: 160000 }
 Graphical Model of Calculations
 -------------------------------
 
+![](Value-Instrument-Graphical-Model-v2.png)
 
 **Figure 1**
 
