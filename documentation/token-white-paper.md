@@ -230,8 +230,7 @@ In the moment a new transaction is executed, the stored On-Chain Account Balance
     New Recipient Account Balance = Decayed Recipient Account Balance + Received Amount
 
 
-<sub>_
-* given linear decaying behavior
+<sub>_* given linear decaying behavior
 ** a system setting set and governed by the network, burned on transaction or partly credited to a community account_</sub>
 
 
