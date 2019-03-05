@@ -2,7 +2,7 @@ Value Instrument
 ==================
 Token White Paper
 ==================
-v0.2.6 Release  |  4<sup>th</sup> March 2019  |  hello@valueinstrument.org
+v0.2.6.1 Release  |  4<sup>th</sup> March 2019  |  hello@valueinstrument.org
 
 Abstract
 --------
@@ -219,20 +219,20 @@ Determine new Account Balance (a)
 
 In the moment a new transaction is executed, the stored On-Chain Account Balances of sender and recipient will have decayed some of their stored amounts. The decayed amount is not shown on-chain, the on-chain data is somewhat "out of date". When calculating the new Account Balances to be written into the new sets, we have to first determine the "actual" account balance for that moment.
 
-    Decayed Account Balance = On-Chain Account Balance - ( On-Chain Account Balance /  (Full Token Lifetime* / ( New Transaction Time - Time of last account activity ) )** )
+    Decayed Account Balance = On-Chain Account Balance - ( On-Chain Account Balance /  (On-Chain Account Balance Time-To-Zero / ( New Transaction Time - Time of last account activity ) )* )
 
 **Update Sender**
 
-    New Sender Account Balance = Decayed Sender Account Balance - Sent Amount - Transaction Fee***
+    New Sender Account Balance = Decayed Sender Account Balance - Sent Amount - Transaction Fee**
 
 **Update Recipient**
 
     New Recipient Account Balance = Decayed Recipient Account Balance + Received Amount
 
 
-<sub>_* a system setting, set and governed by the network
-** given linear decaying behavior
-*** a system setting set and governed by the network, burned on transaction or partly credited to a community account_</sub>
+<sub>_
+* given linear decaying behavior
+** a system setting set and governed by the network, burned on transaction or partly credited to a community account_</sub>
 
 
 
