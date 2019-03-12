@@ -2,6 +2,8 @@
 var str10001 = 'V', // currency unit
     str10005 = 'for', // trigger word
 
+    // str10007 = 'Welcome',
+
     str10010 = 'You must have Cookies enabled in your browser for this web app to function.',
     str10020 = 'Patience, you are being logged in automatically.',
     str10030 = 'Enter your name below to join. Or use your unique phrase to reconnect.',
@@ -13,29 +15,44 @@ var str10001 = 'V', // currency unit
     str10080 = 'Click here to reconnect.',
     str10090 = 'Account removed. Reload the page to start over.',
     str10100 = 'Account has been deactivated. Contact the community admin to regain access.',
-    str10110 = 'Use "send", "pay" or "+" at the start of your message to trigger a transaction. Followed by one or several amounts and then one or several recipients. You can "send 15 to mary" or "send mary 15". In short enter "+15 mary". You can specify e.g. "for guitar lessons" at the very end of the message to include a reference. Try it now!',
+    str10110 = 'How to send funds</br></br><span class="normal-weight">Start your message with "send". Then start typing a recipient and choose from the suggestions. Finally add the amount to transfer. Your message now looks something like "send Mary #2121 15" and is ready to be sent, triggering a transfer.</span></br></br>How to add a reference</br></br><span class="normal-weight">You can further specify e.g. "for guitar lessons" at the very end of the message to include a reference.</span>',
     str10210 = 'Message all or send funds',
-    str20010 = 'Account'
+    str20010 = 'Account',
     str20020 = 'Spendable',
     str20030 = 'Balance',
     str20040 = 'days',
-    str20041 = 'days',
+    str20041 = 'Lifetime',
     str20050 = 'Members',
     str20060 = 'Community',
     str20070 = 'About',
     str20080 = 'Pools',
+    str20081 = 'Map',
     str20085 = 'Contributions',
-    str20090 = 'Offers & Locations',
-    str20095 = 'Community Pools',
+    str20090 = 'Skills',
+    str20091 = 'Jobs',
+    str20092 = 'Places',
+    str20095 = 'Pools',
     str20100 = 'My Account',
     str20110 = 'Profile',
     str20120 = 'Go Offline',
     str20130 = 'History',
-    str20140 = 'Get Help',
+    str20131 = 'Transaction History',
+    str20140 = 'Help',
     str20150 = 'Report Bug',
     str20160 = 'Join',
     str20170 = 'Download',
+    str20180 = 'Mother tongue and other',
+    str20190 = 'Offer Price',
+    str20200 = 'City District',
+
     str30010 = 'not found',
+    str30020 = 'now',
+    str30030 = 'e.g.', // short for "example given"
+    str30040 = 'view',
+    str30050 = 'Please select from suggestions',
+    str30060 = 'description or status message',
+    str30070 = 'delete?',
+
     strTxPg110 = 'Your Transactions',
     strTxPg120 = 'Date',
     strTxPg130 = 'Time',
@@ -45,8 +62,8 @@ var str10001 = 'V', // currency unit
     strTxPg170 = 'Fee',
     strTxPg180 = 'Burn',
     strTxPg190 = 'Initiator',
-    strPfPg110 = 'disabled',
-    strPfPg120 = 'error when disabling',
+    strPfPg110 = 'deleted',
+    strPfPg120 = 'error on deletion',
     strCmPg110 = 'Community Statistics',
     strOfPg110 = 'Go Offline',
     strOfPg120 = 'Please Confirm',
@@ -59,9 +76,11 @@ var str10001 = 'V', // currency unit
     strModule110 = 'Title not allowed. Max 7 words, max 12 letters each',
     strModule120 = 'You are not verified yet',
     strLocMod110 = 'Please select a location',
-    strLocMod120 = 'Please enter a location name',
-    strPolMod110 = 'Please enter a pool name',
+    strLocMod120 = 'Please enter a valid title',
+    strPolMod110 = 'Please enter a valid pool name',
     strPolMod120 = 'Minimum',
     strQCtMod110 = 'Please enter a contribution name',
 
-    endoflist = '';
+    // end of transations
+
+    appLang="en-US.js";

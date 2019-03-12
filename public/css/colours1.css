@@ -5,11 +5,11 @@ https://htmlcolorcodes.com/resources/best-color-palette-generators/
 -------------------------------------------------------------------------------*/
 
 .off-white-text {
- color: #F6EFFF  /* #F3EFFF */
+ color: #FbF4fb  /* #F6EFFF or #F3EFFF */
 }
 
 .off-white-bgrnd {
- background-color: #F6EFFF
+ background-color: #FbF4fb
 }
 
 .off-black-text, body, select, input, textarea {
@@ -21,14 +21,20 @@ https://htmlcolorcodes.com/resources/best-color-palette-generators/
 }
 
 .bar {
-  background-color: #F6EFFF
+  background-color: #FbF4fb
 }
 
 .autocomplete-suggestions  {
-  background-color: #F6EFFF
+  border-color: rgb(99, 82, 185);
+  background-color: #FbF4fb;
+}
+
+#confirm-tx, #disconnected-notification  {
+  background-color: #FbF4fb
 }
 
 #select-menu {
+
     background-color: #151414
 }
 
@@ -37,11 +43,11 @@ https://htmlcolorcodes.com/resources/best-color-palette-generators/
 }
 
 .confirm-text {
- /* color: #1e860d */
+ /* color: rgb(65, 183, 135) */
 }
 
 .green-text {
-  color: #1e860d;
+  color: rgb(65, 183, 135);
 }
 
 .alert-text {
@@ -49,7 +55,13 @@ https://htmlcolorcodes.com/resources/best-color-palette-generators/
 }
 
 .close-x {
-  color: slateblue;
+  color: rgb(99, 82, 185);
+}
+.spent {
+  color: rgb(99, 82, 185);
+}
+.form-control {
+  border-color: lightgray;
 }
 
 .alert-bgrd {
@@ -59,15 +71,19 @@ border-radius: 3px;
 }
 
 .highlight {
-  background-color: #8EA5FF;
+  border-color: rgb(99, 82, 185); /* #8EA5FF */
+}
+
+.highlight-add {
+  background-color: rgb(99, 82, 185);
 }
 
 .highlight-text {
-	color: #8EA5FF;
+	color: rgb(99, 82, 185);
 }
 
 a {
-	color: #8EA5FF;
+	color: rgb(99, 82, 185);
 }
 
 .verified-user {
@@ -75,7 +91,7 @@ a {
 }
 
 .online-user {
- color: #41B787;
+ color: rgb(65, 183, 135);
 }
 
 #system-message {
@@ -84,4 +100,22 @@ a {
 
 .page-off-white-text {
 	color: WhiteSmoke;
+}
+
+#funding-pie {
+  fill: #ddd;
+  stroke: rgb(65, 183, 135);
+}
+
+#funding-chart, #spending-chart {
+  background: #ddd;
+}
+
+#spending-pie {
+  fill: #ddd;
+  stroke: rgb(99, 82, 185);
+}
+
+.fund-now, .find-now, .switch, .switch-highlight, .fund-now, .find-now, .switch, .switch-highlight {
+  background: transparent;
 }

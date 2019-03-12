@@ -4,7 +4,7 @@
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
 
-This repository includes an implementation of the Value Instrument's four principles for monetary design, that aim to stimulate economic activity in communities. This alpha version is coded with blockchain technology in mind, yet it does not run on or connect to any blockchain in its current state.
+This repository includes an implementation of the Value Instrument's four principles for value accounting. This alpha version is coded with distributed ledger technology in mind, yet this repository does not run on or connect to any blockchain in its current state.
 
 Installing and running this alpha will give you an online-banking-web-app with a chat-like user interface.
 
@@ -65,13 +65,13 @@ Navigate to the new folder
 ```
 cd vi-alpha
 ```
-Optinally change git branch before installing dependencies
+Optionally change git branch before installing dependencies, you may skip this step.
 
 ```
 git checkout branch-name
 ```
 
-Install dependencies
+Finally install dependencies
 
 ```
 npm install
@@ -95,14 +95,14 @@ localhost:3021
 
 ## Testing, Managing Accounts and Transacting
 
-Setup test-accounts across several browsers with up to 3 words as their name and send funds between these accounts.
+Setup test-accounts across several browsers and send funds between these accounts.
 
 The accounts also get the tag \#2121 assigned automatically.
 
 Sending funds is triggered by entering one of the following commands into the chat message field:
 
 ```
-send 5 to your-chosen-name-here #2121 | send your-chosen-name-here #2121 53 | +5 your-chosen-name-here #2121
+send 5 to your-chosen-name-here #2121 | send your-chosen-name-here #2121 63 | +5 your-chosen-name-here #2121
 ```
 
 Refer to the manual.md in the documentation folder to find out more about tags, commands and other functionalities
@@ -128,12 +128,6 @@ In index.html:
 src="lang/en-US.js"
 ```
 
-and
-
-```
-var appLang="en-US.js"
-
-```
 
 
 ## Code Structure
@@ -144,6 +138,7 @@ documentation - Includes files for further reading, like manuals, concepts and w
 
 functions - Includes node files / functionalities
 - transaction-mongodb - Includes node files related to initiating transactions and storing them in MongoDB (only)
+- plugins - Includes node files for additional functionalities
 
 lang - Includes translation files for node files
 
@@ -178,9 +173,9 @@ Refer to [deployment.md](deployment.md) in the documentation folder.
 
 ## License
 
-This project is licensed under the Apache 2.0 license - see the [LICENSE.md](LICENSE.md) file for details
+This alpha version of the Value Instrument is licensed under the Apache 2.0 license - see the [LICENSE.md](LICENSE.md) file for details
 
-Code included in the "Plugins" folder may be NOT be licensed under the Apache 2.0 license and instead subject to copyright!
+IMPORTANT: Code included in the "plugins" folders may be NOT be licensed under the Apache 2.0 license and instead subject to copyright!
 
 
 ## Acknowledgements
