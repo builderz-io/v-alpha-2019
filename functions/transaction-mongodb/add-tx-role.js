@@ -19,10 +19,10 @@ module.exports.addTxRole = ( messageParts, entities ) => {
 
   c = entityObjects[2];
 
-  if ( messageParts[0] === i18n.str50020 || messageParts[0] === '-' ) { // request
+  if ( i18n.str50020.includes( messageParts[0] ) ) { // request
     c['roleInTx'] = 'recipient';
   }
-  else if ( messageParts[0] === i18n.str50030 ) { // transfer
+  else if ( i18n.str50030.includes( messageParts[0] ) ) { // transfer
     c['roleInTx'] = 'initiator';
   }
   else { // regular
@@ -33,12 +33,12 @@ module.exports.addTxRole = ( messageParts, entities ) => {
   for ( let i = 3; i < entityObjects.length; i++ ) {
     d = entityObjects[i];
     if ( d ) {
-      if ( messageParts[0] === i18n.str50020 || messageParts[0] === '-' ) { // request
+      if ( i18n.str50020.includes( messageParts[0] ) ) { // request
 
         d['roleInTx'] = 'sender';
 
       }
-      else if ( messageParts[0] === i18n.str50030 ) { // transfer
+      else if ( i18n.str50030.includes( messageParts[0] ) ) { // transfer
 
         if ( ['pool', 'contribution'].includes( d.credentials.role ) ) {
           d['roleInTx'] = 'sender';

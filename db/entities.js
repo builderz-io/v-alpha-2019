@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 
 var entitySchema = mongoose.Schema({
   fullId: String, // name + tag
+  uPhrase: String,
   credentials: {
     name: String,
     tag: String,
-    uPhrase: String,
     role: String,
     status: String,
     socketID: String,
@@ -38,15 +38,22 @@ var entitySchema = mongoose.Schema({
     expires: Date,
     target: Number,
     reward: Number,
-    price: Number,
+    price: String,
     unit: String,
     location: String,
+    languages: String,
   },
   social: {
     fb: String,
     tw: String,
     web: String,
     tele: String,
+    teleChatID: Number,
+    email: String,
+    confirmation: {
+      time: Number,
+      sixDigit: Number,
+    }
   },
   onChain: {
     balance: Number,

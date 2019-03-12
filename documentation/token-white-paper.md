@@ -103,7 +103,7 @@ Prerequisites
 =============
 
 The code developed by the initiators of the Value Instrument in direct relation to the presented concepts is released under the **Apache 2.0 licence** and the supporting material, including this document, is released under the** CC-BY-SA 4.0 International licence**.  \
-The initiators to be credited, in order of surname, are **Anna Blume, Marc Griffiths, Hibryda, Yann Levreau and Philipe Achille Villiers**. 
+The initiators to be credited, in order of surname, are **Anna Blume, Marc Griffiths, Hibryda, Yann Levreau and Philipe Achille Villiers**.
 
 Contributing editor to this document is **Aleeza Howitt**.
 
@@ -206,7 +206,7 @@ The following three data points are stored on-chain:
     2. Balance's Time-To-Zero
     3. Time of Last Account Activity (block of last transaction)
 
-Each transaction writes a new set of these three data points into the chain for the sender and recipient. 
+Each transaction writes a new set of these three data points into the chain for the sender and recipient.
 
 Blocks are used as sequential time measure.
 
@@ -219,7 +219,7 @@ Determine new Account Balance (a)
 
 In the moment a new transaction is executed, the stored On-Chain Account Balances of sender and recipient will have decayed some of their stored amounts. The decayed amount is not shown on-chain, the on-chain data is somewhat "out of date". When calculating the new Account Balances to be written into the new sets, we have to first determine the "actual" account balance for that moment.
 
-    Decayed Account Balance = On-Chain Account Balance - ( On-Chain Account Balance /  (On-Chain Account Balance Time-To-Zero / ( New Transaction Time - Time of last account activity ) )* )
+    Decayed Account Balance = On-Chain Account Balance - ( On-Chain Account Balance /  (On-Chain Account Balance Time-To-Zero  / ( New Transaction Time - Time of last account activity ) )* )
 
 **Update Sender**
 
@@ -244,12 +244,12 @@ For the recipient, the calculation is a little more advanced. Here we take into 
 
 **Recipient**
 
-    New Recipient Account Time-To-Zero = ( Last Recipient Account Activity + Recipient Account Time-To-Zero - New Transaction Time ) * ( Decayed Recipient Account Balance / New Recipient Account Balance ) + Full Token Lifetime * ( Received Amount / New Recipient Account Balance ) 
+    New Recipient Account Time-To-Zero = ( Last Recipient Account Activity + Recipient Account Time-To-Zero - New Transaction Time ) * ( Decayed Recipient Account Balance / New Recipient Account Balance ) + Full Token Lifetime * ( Received Amount / New Recipient Account Balance )
 
 **Sender**
 
     New Sender Account Time-To-Zero = Sender last Account Activity + Sender Account Time-To-Zero - New Transaction Time
-    
+
 <sub>_* alternatively the Recipient Account Time-To-Zero is not weighted, because it has been subject to decay already._</sub>
 
 
@@ -313,7 +313,7 @@ Further conceptual stubs regarding Value Instrument
 
 **Organizations**
 
-It appears that a certain amount of non-anonymity is required to secure the system against sybil attacks. Value Instrument revolves around organizations as "trusted networks". An organization issues the wallets to members and therefore creates a network and can also revoke memberships. Setting up this system through organizations is a security mechanism. 
+It appears that a certain amount of non-anonymity is required to secure the system against sybil attacks. Value Instrument revolves around organizations as "trusted networks". An organization issues the wallets to members and therefore creates a network and can also revoke memberships. Setting up this system through organizations is a security mechanism.
 
 Organizations, such as a coworking space community or a company, have real-life interactions that authenticate members simply on a human level and even without official other documents (like passports). This becomes a _decentralized_ network of organizations with members who are able to exchange using tokens in a _distributed_ way.
 
@@ -351,4 +351,3 @@ Summary & Closing Notes
 =======================
 
 The Value Instrument token design principles allow for highly flexible token creation for many individual use cases. They are open to be integrated into any Dapp, app, software or web-platform. This white paper discusses the token creation, their math and in which context those tokens may be specifically useful. Further important concepts have to be explored, that lie outside the scope of this paper, such as governance models for such tokens, digital unique identity, technological scaling, adoption, regulatory frameworks and the effects of such token on society and ethics.
-

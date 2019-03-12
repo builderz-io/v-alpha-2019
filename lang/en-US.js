@@ -1,8 +1,8 @@
 module.exports = {
 
   str50010: 'for', // trigger word "for"
-  str50020: 'request', // trigger word "request"
-  str50030: 'transfer', // trigger word "transfer"
+  str50020: ['request', '-', 'rx', 'r!'], // trigger commands "request"
+  str50030: ['transfer', 'tx', 't!'], // trigger commands "transfer"
 
   str60010: 'V', // currency unit
 
@@ -15,15 +15,17 @@ module.exports = {
   strNf10010: 'Welcome to',
   strNf10020: 'Note down the above phrase!',
   strNf10023: 'Only you can recover your account. Use this phrase to log in on other devices. You can also find it in your profile.',
-  strNf10030: 'Enter "help" at any time to learn about transferring Value to others.',
+  strNf10030: 'Enter "help" to learn about transferring funds to others.',
   strNf10040: 'Welcome back',
   strNf10045: 'Remember to enter "help" for help.',
   strNf10050: 'Recently received by members',
-  strNf10051: 'recently received by',
+  strNf10051: 'You last received',
   strNf10052: 'for',
-  strNf10053: 'received ', // must have a blank
+  // strNf10053: free to reassign // 'received ', // must have a blank
+  strNf10054: 'by', 
   strNf10060: 'Also check your transaction history',
   strNf10070: 'copy',
+  strNf10080: 'Confirmation Number',
 
   strErTx110: 'Invalid amount',
   strErTx120: 'Your account expired due to inactivity. Please contact the community manager.',
@@ -31,7 +33,7 @@ module.exports = {
   strErTx130: 'No recipient found',
   strErTx140: 'You can not send',
   strErTx141: 'to yourself',
-  // strErTx150: deleted, but keep entry
+  // strErTx150: free to reassign
   strErTx160: 'Request limit of',
   strErTx163: 'exceeded',
   strErTx170: 'You cannot request from',
@@ -39,7 +41,7 @@ module.exports = {
   strErTx180: 'account deactivated',
   strErTx190: 'pool has expired',
   strErTx200: 'You cannot request again until 24 hours have passed',
-  // strErTx210: deleted, but keep entry
+  // strErTx210: free to reassign
   strErTx220: 'Unfortunately you\'re missing',
   strErTx223: 'to make this transaction.',
   strErTx230: 'Balance to low for a transaction of',
@@ -67,48 +69,81 @@ module.exports = {
   strNfTx170: 'transaction',
   strNfTx171: 'transactions',
 
+  strNOut110: 'New account activity',
+
+  strPfPg410: 'Location',
+  strPfPg413: 'Place',
+  strPfPg420: 'Offer',
+  strPfPg423: 'Price',
+  strPfPg424: 'Unit',
+  strPfPg425: 'per',
+
+  strPfPg430: 'Funding Status',
+  strPfPg431: 'Funding Target',
+  strPfPg432: 'Not yet successfully funded',
+  strPfPg433: 'Successfully funded',
+  strPfPg434: 'None yet spent',
+  strPfPg435: 'budget spent',
+
+  strPfPg520: 'Social Links',
+  strPfPg521: 'Facebook',
+  strPfPg522: 'Twitter',
+  strPfPg523: 'Telegram',
+  strPfPg524: 'Website',
+  strPfPg525: 'Email',
+
   strPfPg550: 'All Time Received',
   strPfPg551: 'All Time Sent',
   strPfPg552: 'Statistics',
-  strPfPg553: 'Expires',
+  strPfPg553: 'ID confirmation due',
   strPfPg554: 'Joined',
   strPfPg555: 'Role',
   strPfPg556: 'Unique Phrase',
-  strPfPg557: 'Username',
+  strPfPg557: 'Name',
   strPfPg558: 'Profile',
   strPfPg559: 'Tag',
-  strPfPg570: 'Admin Phrase:',
-  strPfPg580: 'disable',
-  strPfPg600: 'Community Pools',
-  strPfPg610: 'Offers & Locations',
+
+  strPfPg600: 'Pools',
+  strPfPg610: 'Skills',
   strPfPg620: 'Contributions',
-  strPfPg630: 'You currently administer the following accounts',
+  strPfPg630: 'All accounts',
+  strPfPg640: 'Creator',
+  strPfPg650: 'Last Login',
+  strPfPg660: 'Security',
+
+  strPfPg710: 'delete',
+  strPfPg720: 'pause',
+  strPfPg730: 'activate',
+  strPfPg740: 'manage',
+  strPfPg750: 'copy',
+  strPfPg760: 'send funds',
+  strPfPg770: 'edit',
+  strPfPg780: 'view',
+
+  strPfPg810: 'You are not allowed',
+  strPfPg820: 'to edit this entity',
 
   strInit110: 'Ignition Balance',
-  // strInit120: deleted, but keep entry
+  // strInit120: free to reassign
   strInit130: '',
-  strInit140: 'Hello World! This is',
+  strInit140: 'Hello World! This is the network of',
   strInit143: 'Please introduce yourself ...',
 
   strCmPg509: 'Top 10 Verified Recipients',
   strCmPg510: 'Top 10 Verified Senders',
-  strCmPg511: 'Active Locations',
+  strCmPg511: 'Skills Offered',
   strCmPg512: 'Verified Members',
   strCmPg513: 'All Time Volume',
   strCmPg514: 'Statistics',
   strCmPg515: 'Transaction Fee',
-  strCmPg516: 'Time To Zero',
-  // strCmPg517: deleted, but keep entry
+  strCmPg516: 'Lifetime',
+  // strCmPg517: free to reassign
   strCmPg518: 'Interval',
   strCmPg519: 'Payout',
   strCmPg520: 'Token Dynamic',
-  strCmPg521: 'Website',
-  strCmPg522: 'Twitter',
-  strCmPg523: 'Facebook',
-  strCmPg524: 'Social Links',
-  strCmPg525: 'Telegram',
   strCmPg530: 'Active Pools',
   strCmPg540: 'Tax Pool Balance',
   strCmPg550: 'Active Contributions',
+  strCmPg560: 'Powered by',
 
 }

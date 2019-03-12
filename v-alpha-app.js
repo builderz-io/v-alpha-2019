@@ -1,4 +1,4 @@
-// Value Instrument Alpha | Version 0.3.8.0 | Apache 2.0 License | https://github.com/valueinstrument/vi-alpha
+// Value Instrument Alpha | Version 0.4.0 | Apache 2.0 License | https://github.com/valueinstrument/vi-alpha
 
 //*****************    System Init    ********************* //
 
@@ -20,6 +20,7 @@ const io = require( 'socket.io' )( http );
 const path = require( 'path' );
 const mongoose = require( 'mongoose' );
 
+
 // database
 
 const EntityDB = require( './db/entities' );
@@ -40,11 +41,14 @@ mongoose.connect( mongoUrl, function( err ) {
 
         }
 
-        require( './functions/database-initialization' ).dbInit(); // eslint-disable-line global-require
+        systemInit.initializeDatabase ? require( './functions/database-initialization' ).dbInit() : null; // eslint-disable-line global-require
         // optionally load demo/testing content
-        systemInit.geoModule ? require( './public/plugins/map/js/geoDemoContent' ).geoDemo() : null; // eslint-disable-line global-require
-        systemInit.poolModule ? require( './public/plugins/pool/js/poolDemoContent' ).poolDemo() : null; // eslint-disable-line global-require
-        systemInit.contributionModule ? require( './public/plugins/contribution/js/qcDemoContent' ).contributionDemo() : null; // eslint-disable-line global-require
+        systemInit.geoModule && systemInit.loadDemoContent ? require( './public/plugins/map/js/geoDemoContent' ).geoDemoA() : null; // eslint-disable-line global-require
+        systemInit.geoModule && systemInit.loadDemoContent ? require( './public/plugins/map/js/geoDemoContent' ).geoDemoC() : null; // eslint-disable-line global-require
+        systemInit.geoModule && systemInit.loadDemoContent ? require( './public/plugins/map/js/geoDemoContent' ).geoDemoB() : null; // eslint-disable-line global-require
+        systemInit.poolModule && systemInit.loadDemoContent ? require( './public/plugins/pool/js/poolDemoContent' ).poolDemoA() : null; // eslint-disable-line global-require
+        systemInit.poolModule && systemInit.loadDemoContent ? require( './public/plugins/pool/js/poolDemoContent' ).poolDemoB() : null; // eslint-disable-line global-require
+        systemInit.contributionModule && systemInit.loadDemoContent ? require( './public/plugins/contribution/js/qcDemoContent' ).contributionDemo() : null; // eslint-disable-line global-require
 
 
         console.log( '(' + formattedDate + ') ' + 'Dropped MongoDB ' );
@@ -75,7 +79,7 @@ EntityDB.find().select( 'credentials' ).exec( ( err, res ) => {
 // app & server
 
 app.get( '/', function( req, res ) {
-  res.sendFile( __dirname + '/public/index.html' );
+  res.sendFile( __dirname + '/public/index-' + systemInit.communityGovernance.indexSuffix + '.html' );
 } );
 
 app.use( compression() );
@@ -83,8 +87,8 @@ app.use( minify() );
 app.use( express.static( path.join( __dirname, 'public' ) ) );
 
 
-http.listen( 3021, 'localhost', function() {
-  console.log( '(' + formattedDate + ') ' + 'Listening on port 3021' );
+http.listen( systemInit.communityGovernance.commPort, 'localhost', function() {
+  console.log( '(' + formattedDate + ') ' + 'Listening on port ' + systemInit.communityGovernance.commPort );
 } );
 
 //*****************    Plugins    ********************* //
@@ -101,12 +105,18 @@ if ( systemInit.poolModule ) { require( './public/plugins/pool/js/v-alpha-pool' 
 
 if ( systemInit.contributionModule ) { require( './public/plugins/contribution/js/v-alpha-qc' )( io ) }  // eslint-disable-line global-require
 
+// Telegram Module
+
+if ( systemInit.telegramModule.on ) {
+  const telegramBotListener = require( './functions/plugins/telegram/telegram').telegramConnect;
+  telegramBotListener( io );
+}
 
 //*****************    Core functionality    ********************* //
 
 require( './functions/message' )( io );   // chat message function
 
-require( './functions/transaction-mongodb/transaction' )( io );   // new transaction function // // TODO: replace after testing
+require( './functions/transaction-mongodb/transaction' )( io );   // new transaction function
 
 require( './functions/user-management' )( io );   // user management functions
 

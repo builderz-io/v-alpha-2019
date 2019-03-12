@@ -8,6 +8,8 @@ const checkValid = require( '../../functions/transaction-mongodb/check-tx-validi
 const updateEntities = require( '../../functions/transaction-mongodb/update-entities' );
 const notifications = require( '../../functions/transaction-mongodb/notifications' );
 
+const constructTx = require('../../functions/tools').constructTx;
+
 
 exports = module.exports = function( io ) {
 
@@ -18,39 +20,46 @@ exports = module.exports = function( io ) {
       callback( false );
     } );
 
-    socket.on( 'transaction', function( data, callback ) {
+    socket.on( 'test transaction', function( data, callback ) {
 
       const messageParts = data[0];
       const uPhrase = data[1];
 
-      const date = Date.now(),
-        timeSecondsUNIX = Number( Math.floor( date / 1000 ) ),
-        forIndex = messageParts.indexOf( i18n.str50010 );
-      var reference = '';
-
-      if ( forIndex != -1 ) {
-        reference = messageParts.slice( forIndex + 1, messageParts.length ).join( ' ' ).trim();
-        messageParts.splice( forIndex, messageParts.length - forIndex );
-      }
-
-      const amount = messageParts.filter( function( item ) { return Number( parseInt( item ) == item ) } ).reduce( function( acc, val ) { return Number( acc ) + Number( val ) }, 0 );
-
       findEntities.findAllEntities( messageParts, uPhrase )
         .then( entities => {
-
+          const txData = constructTx( messageParts );
           const txRoleEntities = addTxRole.addTxRole( messageParts, entities );
-
-          const checkValidity = checkValid.checkTxValidity( txRoleEntities, amount, timeSecondsUNIX, reference, messageParts[0] );
+          const checkValidity = checkValid.checkTxValidity( txRoleEntities, txData.amount, txData.timeSecondsUNIX, txData.reference, messageParts[0] );
 
           if ( checkValidity != true ) {
             notifications.errorNotification( socket, checkValidity );
             return callback( false );
           }
           else {
-            updateEntities.updateAllEntities( txRoleEntities, amount, date, timeSecondsUNIX, reference, messageParts[0], io );
-            notifications.notifyAllEntities( txRoleEntities, amount, date, timeSecondsUNIX, reference, messageParts[0], io );
-            return callback( true );
+            return callback( [txData.amount, txData.reference, messageParts[0]] );
           } // close else (valid transaction)
+
+        } )
+        .catch( ( err ) => {
+          console.log( 'Issue when testing transaction - ' + err );
+        } );
+
+    } );  // close socket.on('test transaction')
+
+    socket.on( 'transaction', function( data, callback ) {
+
+      const messageParts = data[0];
+      const uPhrase = data[1];
+
+      findEntities.findAllEntities( messageParts, uPhrase )
+        .then( entities => {
+
+          const txData = constructTx( messageParts );
+          const txRoleEntities = addTxRole.addTxRole( messageParts, entities );
+
+          updateEntities.updateAllEntities( txRoleEntities, txData.amount, txData.date, txData.timeSecondsUNIX, txData.reference, messageParts[0], io );
+          notifications.notifyAllEntities( txRoleEntities, txData.amount, txData.date, txData.timeSecondsUNIX, txData.reference, messageParts[0], io );
+          return callback( true );
 
         } )
         .catch( ( err ) => {

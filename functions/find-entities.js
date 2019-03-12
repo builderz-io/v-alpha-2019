@@ -9,7 +9,7 @@ module.exports.findAllEntities = ( messageParts, uPhrase ) => {
 
   const getUser = ( name, tag ) => {
     return new Promise( resolve => {
-      EntityDB.findOne( { '$and': [{'credentials.tag': tag}, {'credentials.name': name }] } ).exec( function( err, doc ) {
+      EntityDB.findOne( { $and: [{'credentials.tag': tag}, {'credentials.name': name }] }, {uPhrase: false} ).exec( function( err, doc ) {
         if ( err ) { resolve( 'Error: ' + err )}
         doc ? resolve( doc ) : resolve( 'not found' );
       } );
@@ -18,7 +18,7 @@ module.exports.findAllEntities = ( messageParts, uPhrase ) => {
 
   const getInitiator = ( uPhrase ) => {
     return new Promise( resolve => {
-      EntityDB.findOne( { 'credentials.uPhrase': uPhrase } ).exec( function( err, doc ) {
+      EntityDB.findOne( { uPhrase: uPhrase }, {uPhrase: false} ).exec( function( err, doc ) {
         if ( err ) { resolve( 'Error: ' + err )}
         doc ? resolve( doc ) : resolve( 'not found' );
       } );

@@ -16,7 +16,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
 	<!-- Important stuff for SEO, don't neglect. (And don't dupicate values across your site!) -->
-	<title></title>
+	<title>Value Instrument Alpha</title>
 	<meta name="author" content="Value Instrument" />
 	<meta name="description" content="See the Value Instrument Principles in action in this functional Alpha Version" />
 
@@ -36,6 +36,7 @@
 
 	<link rel="preload" href="/webfonts/Prompt-ExtraLight.ttf" as="font" crossorigin>
 	<link rel="preload" href="/webfonts/Prompt-Regular.ttf" as="font" crossorigin>
+	<link rel="preload" href="/webfonts/Heebo-Bold.ttf" as="font" crossorigin>
 	<link rel="preload" href="/webfonts/fa-solid-900.woff2" as="font" crossorigin>
 	<style>
 	@font-face {
@@ -55,6 +56,15 @@
 	 /* font-stretch: semi-expanded; */
 	 src:  url(/webfonts/Prompt-Regular.ttf) format('truetype');
 	 unicode-range: U+000-024F;
+	}
+	@font-face {
+	 font-family: 'Heebo Bold';
+	 font-display: fallback;
+	 font-style: normal;
+	 font-weight: 700;
+	 font-stretch: extra-expanded;
+	 src:  url(/webfonts/Heebo-Bold.ttf) format('truetype');
+	 unicode-range: U+0041-0056;
 	}
 	@font-face {
 	  font-family: 'Font Awesome 5 Free';
@@ -85,39 +95,39 @@
 </head>
 <body>
 <main>
-  <menu class="off-white-text">
+  <menu id="menu" class="off-white-text">
     <div id="chart" class="chart-container"></div>
 
-    <div id="user-account-data">
+    <!-- <div id="user-account-data">
       <div id="account-title"><span class="currency-unit"></span> <span id="str20010"></span><br/><br/></div>
         <table id="account-data-table">
-          <tr class=""><td class="" id="str20020"></td><td id="spendable" class="align-right"></td><td> <span class="currency-unit"></span></td><td id="rt0" class="align-right"></td><td id="str20040"></td></tr>
-          <tr class=""><td class="" id="str20030"></td><td id="balance" class="align-right"></td><td> <span class="currency-unit"></span></td><td id="at0" class="align-right"></td><td id="str20041"></td></tr>
+          <tr class=""><td class="" id="str20020"></td><td id="spendable" class="align-right"></td><td> <span class="currency-unit"></span></td></tr>
+          <tr class=""><td class="" id="str20030"></td><td id="balance" class="align-right"></td><td> <span class="currency-unit"></span></td></tr>
+          <tr class=""><td class="" id="str20041"></td><td id="rt0" class="align-right"></td><td> <span class="lifetime-unit"></span></td></tr>
         </table>
-    </div>
+    </div> -->
 
     <ul id="select-menu">
         <li class="pushy-submenu">
-            <button id="first-link" class="off-white-text"></button>
-            <ul id="user-online-list">
-            </ul>
+            <button id="menu-members" class="off-white-text"></button>
+            <ul id="user-online-list"></ul>
         </li>
 
         <li class="pushy-submenu">
-          <button id="comm-profile" class="off-white-text"></button>
+          <button id="menu-community" class="off-white-text"></button>
           <ul id="profile-list">
-              <li class="pushy-link"><button id="about-btn" class="btn-in-menu off-white-text"></button></li>
+						<li class="pushy-link"><button id="about-btn" class="btn-in-menu off-white-text"></button></li>
           </ul>
         </li>
         <li class="pushy-submenu">
-          <button id="account-profile" class="off-white-text"></button>
+          <button id="menu-account" class="off-white-text"></button>
           <ul id="profile-list">
               <li class="pushy-link"><button id="profile-btn" class="btn-in-menu off-white-text"></button></li>
 							<li class="pushy-link"><button id="download-btn" class="btn-in-menu off-white-text"></button></li>
               <li class="pushy-link ext-link"><a href="http://valueinstrument.org/alpha-help" target="_blank" class="off-white-text" id="help-link"></a></li>
               <!--li class="pushy-link ext-link"><a href="http://valueinstrument.org/contact" target="_blank" class="off-white-text" id="report-link"></a></li-->
               <li class="pushy-link"><button id="offline-btn" class="btn-in-menu off-white-text"></button></li>
-              <li class="pushy-link"><button id="tx-history-btn" class="btn-in-menu off-white-text"></button></li>
+              <!-- <li class="pushy-link"><button id="tx-history-btn" class="btn-in-menu off-white-text"></button></li> -->
           </ul>
         </li>
     </ul>
@@ -135,12 +145,17 @@
     </label>
 
 		<header id="site-header" class="site-header off-black-bgrnd off-white-text">
-			<div id="header-left"></div>
+			<!-- <img id"network-logo" src="css/... .png" alt="" /> -->
+
+			<button id="header-left" class="off-white-text"></button>
+
+			<button class="hidden-btn" onclick="copyHiddenPhrase('vxiZ8cltzsdz1gdvnAABt')"></button>
+			<button class="hidden-btn" onclick="copyHiddenPhrase('vxiZ8ctagtmsq74icAABt')"></button>
 
 			<div id="header-svg"></div>
 
 			<div id="name-in-header">
-				<span id="user-in-header"></span>
+				<button id="user-in-header" class="off-white-text"></button>
 			</div>
 
 		</header>
@@ -148,7 +163,7 @@
     <div id="system-message"></div>
 
 		<div id="signup-header" class="off-black-bgrnd off-white-text">
-			<span id="su-header-left"></span></div>
+			<span id="su-header-left">Welcome</span>
 			<div id="su-header-right"></div>
 		</div>
 
@@ -164,7 +179,7 @@
 
       <form autocomplete="off" id="textarea-form" class="form-width" action="">
         <textarea id="textarea-text" class="autoExpand message-textarea off-white-bgrnd" rows="1" data-min-rows="1"></textarea>
-        <button id="textarea-button" class="send-btn off-black-bgrnd off-white-text"><i class="fas fa-paper-plane"></i></button>
+        <button id="textarea-button" class="send-btn off-black-bgrnd off-white-text"><i id="send-btn" class="fas fa-paper-plane"></i></button>
       </form>
     </div>
 
@@ -172,11 +187,33 @@
 
   	<div id="page">
   		<div class="page-content">
+				<div id="page-send-funds"></div>
   			<div class="page-title"></div>
+				<div id="page-description"></div>
   			<div class="page-pipe"></div>
   		</div>
-  		<i class="fas fa-times-circle close-page page-off-white-text"></i>
-			<div id="top-right-close"></div>
+  		<i id="close-page" class="fas fa-times-circle close-page page-off-white-text"></i>
+			<div id="top-close"></div>
+  	</div>
+
+  	<div id="map-page">
+  		<div class="map-page-content">
+  			<div class="map-page-pipe"></div>
+  		</div>
+  		<i id="close-map-page" class="fas fa-times-circle close-page page-off-white-text"></i>
+			<i id="close-filter" class="fas fa-times-circle close-page page-off-white-text"></i>
+			<div id="top-map-close"></div>
+  	</div>
+
+  	<div id="profile-page">
+  		<div class="profile-page-content">
+				<div id="profile-page-send-funds"></div>
+  			<div class="profile-page-title"></div>
+				<div id="profile-page-description"></div>
+  			<div class="profile-page-pipe"></div>
+  		</div>
+  		<i id="close-profile-page" class="fas fa-times-circle close-page page-off-white-text"></i>
+			<div id="top-profile-close"></div>
   	</div>
 
     <div id="container" class="off-white-bgrnd">
@@ -191,10 +228,33 @@
 <script src="js/js.cookie.min.js"></script>
 
 <script src="lang/en-US.js"></script>
-<script> var appLang="en-US.js" </script>
+
+<script>
+  //  global variables
+
+  var socket = io();
+	var headerLeft = '';
+
+	var map;
+	var mapboxAPI;
+	var lastViewedMap = "";
+	var mapFilterData = [];
+
+  var messageParts;
+
+	// TODO: move from globals
+
+</script>
 
 <script src="lang/triggers.js"></script>
-<script src="js/tools.js"></script>
+<script src="js/tools.js" async></script>
+<script src="js/ui-state.js" async></script>
+
+<script src="plugins/autocomplete/autocomplete.js"></script>
+<script src="plugins/map/js/v-alpha-map-front.js"></script>
+<!-- <script src="plugins/allmap/js/v-alpha-all-map-front.js"></script> -->
+<script src="plugins/pool/js/v-alpha-pool-front.js"></script>
+<!-- <script src="plugins/contribution/js/v-alpha-qc-front.js"></script> -->
 
 <script src="js/v-alpha-front.js"></script>
 
